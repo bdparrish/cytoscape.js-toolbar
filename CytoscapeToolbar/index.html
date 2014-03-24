@@ -33,10 +33,7 @@
                     {
                         selector: 'node',
                         css: {
-                            'content': 'data(name)',
-                            'text-halign': 'center',
-                            'text-valign': 'center',
-                            'background-opacity': '0'
+                            'content': 'data(name)'
                         }
                     },
 
@@ -44,52 +41,6 @@
                         selector: 'edge',
                         css: {
                             'target-arrow-shape': 'triangle'
-                        }
-                    },
-
-                    // custom classes
-                    {
-                        selector: '.selected-node',
-                        css: {
-                            'border-color': '#f00',
-                            'border-width': '2px'
-                        }
-                    },
-                    {
-                        selector: '.tool-node',
-                        css: {
-                            'font-family': 'FontAwesome',
-                            'font-size': '3em',
-                        }
-                    },
-                    {
-                        selector: '.node-person',
-                        css: {
-                            'content': '\uf183'
-                        }
-                    },
-                    {
-                        selector: '.node-home',
-                        css: {
-                            'content': '\uf015'
-                        }
-                    },
-                    {
-                        selector: '.node-business',
-                        css: {
-                            'content': '\uf0f7'
-                        }
-                    },
-                    {
-                        selector: '.node-automobile',
-                        css: {
-                            'content': '\uf0d1'
-                        }
-                    },
-                    {
-                        selector: '.node-asset',
-                        css: {
-                            'content': '\uf072'
                         }
                     }
                 ],
@@ -116,91 +67,6 @@
             });
 
             $('#cy').cytoscapeToolbar();
-
-            //#region node tools
-            function addPersonToGraph(e) {
-                addObject(e, addPersonToGraph);
-            }
-
-            function addHouseToGraph(e) {
-                addObject(e, addHouseToGraph);
-            }
-
-            function addBusinessToGraph(e) {
-                addObject(e, addBusinessToGraph);
-            }
-
-            function addAutoToGraph(e) {
-                addObject(e, addAutoToGraph);
-            }
-
-            function addAssetToGraph(e) {
-                addObject(e, addAssetToGraph);
-            }
-
-            function addObject(e, action) {
-                if (!e.data.canPerform(e, action)) {
-                    return;
-                }
-
-                var toolIndexes = e.data.data.selectedTool;
-                var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
-
-                var object = {
-                    group: 'nodes',
-                    data: {
-                        name: tool.options.text
-                    },
-                    position: {
-                        x: e.cyPosition.x,
-                        y: e.cyPosition.y
-                    }
-                }
-
-                e.cy.add(object).addClass('tool-node').addClass(tool.options.clazz);
-            }
-            //#endregion
-
-            //#region linking
-            var src;
-            function performLink(e) {
-                if (!e.data.canPerform(e, performLink)) {
-                    return;
-                }
-
-                if (src) {
-                    tgt = e.cyTarget;
-
-                    e.cy.add({
-                        group: "edges",
-                        data: {
-                            source: src.id(),
-                            target: tgt.id()
-                        }
-                    });
-
-                    src.removeClass('selected-node');
-                    src = undefined;
-                } else {
-                    src = e.cyTarget;
-                    src.addClass('selected-node');
-                }
-            }
-
-            function getLinkName(src, tgt) {
-                return src.id() + "->" + tgt.id();
-            }
-            //#endregion
-
-            //#region Remove
-            function performRemove(e) {
-                if (!e.data.canPerform(e, performRemove)) {
-                    return;
-                }
-
-                cy.remove(e.cyTarget);
-            }
-            //#endregion
         });
     </script>
 </head>
