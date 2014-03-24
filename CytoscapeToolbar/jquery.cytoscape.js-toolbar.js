@@ -196,59 +196,6 @@
 				break;
 		}
 	}
-
-	function handle2pan(e) {
-		var v = {
-			x: e.originalEvent.pageX - $panner.offset().left - $panner.width() / 2,
-			y: e.originalEvent.pageY - $panner.offset().top - $panner.height() / 2
-		}
-
-		var r = options.panDragAreaSize;
-		var d = Math.sqrt(v.x * v.x + v.y * v.y);
-		var percent = Math.min(d / r, 1);
-
-		if (d < options.panInactiveArea) {
-			return {
-				x: NaN,
-				y: NaN
-			};
-		}
-
-		v = {
-			x: v.x / d,
-			y: v.y / d
-		};
-
-		percent = Math.max(options.panMinPercentSpeed, percent);
-
-		var vnorm = {
-			x: -1 * v.x * (percent * options.panDistance),
-			y: -1 * v.y * (percent * options.panDistance)
-		};
-
-		return vnorm;
-	}
-
-	function positionIndicator(pan) {
-		var v = pan;
-		var d = Math.sqrt(v.x * v.x + v.y * v.y);
-		var vnorm = {
-			x: -1 * v.x / d,
-			y: -1 * v.y / d
-		};
-
-		var w = $panner.width();
-		var h = $panner.height();
-		var percent = d / options.panDistance;
-		var opacity = Math.max(options.panIndicatorMinOpacity, percent);
-		var color = 255 - Math.round(opacity * 255);
-
-		$pIndicator.show().css({
-			left: w / 2 * vnorm.x + w / 2,
-			top: h / 2 * vnorm.y + h / 2,
-			background: "rgb(" + color + ", " + color + ", " + color + ")"
-		});
-	}
     //#endregion
 
 	$.fn.cytoscapeToolbar = function (params) {
@@ -265,7 +212,7 @@
 	            var finalToolsList = defaults.tools;
 
 	            for (var i = 0; i < options.tools.length; i++) {
-	                if (!$.inArray(options.tools[i], finalToolsList)) {
+	                if ($.inArray(options.tools[i], finalToolsList) == -1) {
 	                    finalToolsList.push(options.tools[i]);
 	                }
 	            }
