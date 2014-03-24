@@ -1,11 +1,11 @@
 ﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title></title>
-    <link href="font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <title>Create Custom Nodes</title>
+    <link href="../../font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
-    <script src="jquery.cytoscape.js-toolbar.js"></script>
+    <script src="../../jquery.cytoscape.js-toolbar.js"></script>
 
     <style>
         body {
@@ -39,7 +39,6 @@
                             'background-opacity': '0'
                         }
                     },
-
                     {
                         selector: 'edge',
                         css: {
@@ -48,13 +47,6 @@
                     },
 
                     // custom classes
-                    {
-                        selector: '.selected-node',
-                        css: {
-                            'border-color': '#f00',
-                            'border-width': '2px'
-                        }
-                    },
                     {
                         selector: '.tool-node',
                         css: {
@@ -95,27 +87,73 @@
                 ],
 
                 elements: {
-                    nodes: [
-                        { data: { id: 'j', name: 'Jerry' } },
-                        { data: { id: 'e', name: 'Elaine' } },
-                        { data: { id: 'k', name: 'Kramer' } },
-                        { data: { id: 'g', name: 'George' } }
-                    ],
-                    edges: [
-                        { data: { source: 'j', target: 'e' } },
-                        { data: { source: 'j', target: 'k' } },
-                        { data: { source: 'j', target: 'g' } },
-                        { data: { source: 'e', target: 'j' } },
-                        { data: { source: 'e', target: 'k' } },
-                        { data: { source: 'k', target: 'j' } },
-                        { data: { source: 'k', target: 'e' } },
-                        { data: { source: 'k', target: 'g' } },
-                        { data: { source: 'g', target: 'j' } }
-                    ]
+                    nodes: [],
+                    edges: []
                 },
             });
 
-            $('#cy').cytoscapeToolbar();
+            $('#cy').cytoscapeToolbar({
+                tools: [
+                    [
+				        {
+				            icon: 'fa fa-male',
+				            event: ['tap'],
+				            selector: 'cy',
+				            options: {
+				                clazz: 'node-person'
+				            },
+				            bubbleToCore: false,
+				            tooltip: 'Person',
+				            action: [addPersonToGraph]
+				        },
+				        {
+				            icon: 'fa fa-home',
+				            event: ['tap'],
+				            selector: 'cy',
+				            options: {
+				                clazz: 'node-home'
+				            },
+				            bubbleToCore: false,
+				            tooltip: 'House',
+				            action: [addHouseToGraph]
+				        },
+				        {
+				            icon: 'fa fa-building-o',
+				            event: ['tap'],
+				            selector: 'cy',
+				            options: {
+				                clazz: 'node-business'
+				            },
+				            bubbleToCore: false,
+				            tooltip: 'Business',
+				            action: [addBusinessToGraph]
+				        },
+				        {
+				            icon: 'fa fa-truck',
+				            event: ['tap'],
+				            selector: 'cy',
+				            options: {
+				                clazz: 'node-automobile'
+				            },
+				            bubbleToCore: false,
+				            tooltip: 'Automobile',
+				            action: [addAutoToGraph]
+				        },
+				        {
+				            icon: 'fa fa-plane',
+				            event: ['tap'],
+				            selector: 'cy',
+				            options: {
+				                clazz: 'node-asset'
+				            },
+				            bubbleToCore: false,
+				            tooltip: 'Asset',
+				            action: [addAssetToGraph]
+				        }
+                    ]
+                ],
+                appendTools: false
+            });
 
             //#region node tools
             function addPersonToGraph(e) {
@@ -158,47 +196,6 @@
                 }
 
                 e.cy.add(object).addClass('tool-node').addClass(tool.options.clazz);
-            }
-            //#endregion
-
-            //#region linking
-            var src;
-            function performLink(e) {
-                if (!e.data.canPerform(e, performLink)) {
-                    return;
-                }
-
-                if (src) {
-                    tgt = e.cyTarget;
-
-                    e.cy.add({
-                        group: "edges",
-                        data: {
-                            source: src.id(),
-                            target: tgt.id()
-                        }
-                    });
-
-                    src.removeClass('selected-node');
-                    src = undefined;
-                } else {
-                    src = e.cyTarget;
-                    src.addClass('selected-node');
-                }
-            }
-
-            function getLinkName(src, tgt) {
-                return src.id() + "->" + tgt.id();
-            }
-            //#endregion
-
-            //#region Remove
-            function performRemove(e) {
-                if (!e.data.canPerform(e, performRemove)) {
-                    return;
-                }
-
-                cy.remove(e.cyTarget);
             }
             //#endregion
         });

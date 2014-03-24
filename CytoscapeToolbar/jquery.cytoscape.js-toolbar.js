@@ -8,7 +8,7 @@
 					icon: 'fa fa-search-plus', // icon from font-awesome-4.0.3, if you want to use something else, then this becomes a class specific for this tool item
 					event: ['tap'], // array of cytoscape events that correlates with action variable
 					selector: 'cy', // cytoscape selector (cy = core instance, node, edge) - currently not supporting full selection selectors from the documentation
-					factors: {
+					options: {
 						cy: {
 							zoom: 0.1,
 							minZoom: 0.1,
@@ -26,7 +26,7 @@
 					icon: 'fa fa-search-minus',
 					event: ['tap'],
 					selector: 'cy',
-					factors: {
+					options: {
 						cy: {
 							zoom: -0.1,
 							minZoom: 0.1,
@@ -44,7 +44,7 @@
 					icon: 'fa fa-arrow-right',
 					event: ['tap'],
 					selector: 'cy',
-					factors: {
+					options: {
 						cy: {
 							distance: -80,
 						}
@@ -57,7 +57,7 @@
 					icon: 'fa fa-arrow-down',
 					event: ['tap'],
 					selector: 'cy',
-					factors: {
+					options: {
 						cy: {
 							distance: -80,
 						}
@@ -70,7 +70,7 @@
 					icon: 'fa fa-arrow-left',
 					event: ['tap'],
 					selector: 'cy',
-					factors: {
+					options: {
 						cy: {
 							distance: 80,
 						}
@@ -83,7 +83,7 @@
 					icon: 'fa fa-arrow-up',
 					event: ['tap'],
 					selector: 'cy',
-					factors: {
+					options: {
 						cy: {
 							distance: 80,
 						}
@@ -92,75 +92,16 @@
 					tooltip: 'Pan Up',
 					action: [performPanUp]
 				}
-			],
-			[
-				{
-					icon: 'fa fa-male',
-					event: ['tap'],
-					selector: 'cy',
-					bubbleToCore: false,
-					tooltip: 'Person',
-					action: [addPersonToGraph]
-				},
-				{
-					icon: 'fa fa-home',
-					event: ['tap'],
-					selector: 'cy',
-					bubbleToCore: false,
-					tooltip: 'House',
-					action: [addHouseToGraph]
-				},
-				{
-					icon: 'fa fa-building-o',
-					event: ['tap'],
-					selector: 'cy',
-					bubbleToCore: false,
-					tooltip: 'Business',
-					action: [addBusinessToGraph]
-				},
-				{
-					icon: 'fa fa-truck',
-					event: ['tap'],
-					selector: 'cy',
-					bubbleToCore: false,
-					tooltip: 'Automobile',
-					action: [addAutoToGraph]
-				},
-				{
-					icon: 'fa fa-plane',
-					event: ['tap'],
-					selector: 'cy',
-					bubbleToCore: false,
-					tooltip: 'Asset',
-					action: [addAssetToGraph]
-				}
-			],
-			[
-				{
-					icon: 'fa fa-link',
-					event: ['tap'],
-					selector: 'node',
-					bubbleToCore: false,
-					tooltip: 'Link',
-					action: [performLink]
-				},
-				{
-					icon: 'fa fa-unlink',
-					event: ['tap'],
-					selector: 'node',
-					bubbleToCore: false,
-					tooltip: 'Unlink',
-					action: [performUnlink]
-				}
 			]
 		],
-		appendTools: false, // set whether or not to append your custom tools list to the default tools list
-		position: 'right', // set position of toolbar (top, right, bottom, left)
+		appendTools: true, // set whether or not to append your custom tools list to the default tools list
+		position: 'left', // set position of toolbar (right, left)
 		toolbarClass: 'ui-cytoscape-toolbar', // set a class name for the toolbar to help with styling
 		multipleToolsClass: 'tool-item-list', // set a class name for the tools that should be shown in the same position
 		toolItemClass: 'tool-item', //set a class name for a toolbar item to help with styling
 		autodisableForMobile: true, // disable the toolbar completely for mobile (since we don't really need it with gestures like pinch to zoom)
-		zIndex: 9999 // the z-index of the ui div
+		zIndex: 9999, // the z-index of the ui div
+        longClickTime: 325 // time until a multi-tool list will present other tools
 	};
 
 	//#region zooming
@@ -180,10 +121,10 @@
 		var toolIndexes = e.data.data.selectedTool;
 		var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
 
-		zoom(e.cy, e.originalEvent.offsetX, e.originalEvent.offsetY, tool.factors.cy);
+		zoomGraph(e.cy, e.originalEvent.offsetX, e.originalEvent.offsetY, tool.options.cy);
 	}
 
-	function zoom(core, x, y, factors) {
+	function zoomGraph(core, x, y, factors) {
 		var factor = 1 + factors.zoom;
 
 		var zoom = cy.zoom();
@@ -240,7 +181,7 @@
 		var toolIndexes = e.data.data.selectedTool;
 		var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
 
-		pan(e.cy, direction, tool.factors.cy);
+		pan(e.cy, direction, tool.options.cy);
 	}
 
 	function pan(core, direction, factors) {
@@ -308,51 +249,30 @@
 			background: "rgb(" + color + ", " + color + ", " + color + ")"
 		});
 	}
-	//#endregion
-
-	//#region node tools
-	function addPersonToGraph(e) {
-
-	}
-
-	function addHouseToGraph(e) {
-
-	}
-
-	function addBusinessToGraph(e) {
-
-	}
-
-	function addAutoToGraph(e) {
-
-	}
-
-	function addAssetToGraph(e) {
-
-	}
-	//#endregion
-
-	//#region linking
-	var srcSelection;
-	function performLink(e) {
-		if (!e.data.canPerform(e, performLink)) {
-			return;
-		}
-	}
-
-	function performUnlink(e) {
-
-	}
-	//#endregion
+    //#endregion
 
 	$.fn.cytoscapeToolbar = function (params) {
-		var options = $.extend(true, {}, defaults, params);
+	    var options = $.extend(true, {}, defaults, params);
 
-		if (options.appendTools) {
-			for (var i = 0; i < defaults.tools.length; i++) {
-				options.tools.splice(i, 0, defaults.tools[i]);
-			}
-		}
+	    if (params) {
+	        options.tools = params.tools;
+	    }
+
+	    if (options.appendTools) {
+	        if (!options.tools) {
+	            options.tools = defaults.tools;
+	        } else {
+	            var finalToolsList = defaults.tools;
+
+	            for (var i = 0; i < options.tools.length; i++) {
+	                if (!$.inArray(options.tools[i], finalToolsList)) {
+	                    finalToolsList.push(options.tools[i]);
+	                }
+	            }
+
+	            options.tools = finalToolsList;
+	        }
+	    }
 
 		var fn = params;
 		var $container = $('#' + options.cyContainer);
@@ -388,7 +308,10 @@
 						case 'node':
 							return e.cyTarget.isNode();
 						case 'edge':
-							return e.cyTarget.isEdge();
+						    return e.cyTarget.isEdge();
+					    case 'node,edget':
+					    case 'edge,node':
+					        return e.cyTarget.isNode() || e.cyTarget.isEdge();
 						case 'cy':
 							return e.cyTarget == cy || tool.bubbleToCore;
 					}
@@ -468,7 +391,8 @@
 													width: 45,
 													height: 45,
 													position: 'relative',
-													overflow: 'hidden'
+													overflow: 'hidden',
+													float: 'left'
 												});
 
 					$toolbar.append($toolListWrapper);
@@ -488,7 +412,7 @@
 					var $toolList = $('<div class="' + options.multipleToolsClass + '"></div>')
 										.css({
 											position: 'absolute',
-											width: toolList.length * 45,
+											width: toolList.length * 55,
 											height: 45,
 											'background-color': '#ddd'
 										});
@@ -509,7 +433,7 @@
 						}
 
 						var clazz = options.toolItemClass + ' icon ' + element.icon + ' tooltip';
-						var style = 'cursor: pointer; color: #aaa; font-size: 24px; ' + padding;
+						var style = 'cursor: pointer; color: #aaa; width: 35px; height: 35px; font-size: 24px; ' + padding;
 
 						var jElement = $('<span ' +
 							'id="tool-' + toolListIndex + '-' + toolIndex + '" ' +
@@ -537,7 +461,7 @@
 										toolItemLongHold = true;
 										$toolListWrapper.css('overflow', 'visible');
 									}
-								}, 1000);
+								}, options.longClickTime);
 							})
 							.mouseup(function () {
 								endTime = new Date().getTime();

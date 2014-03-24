@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Create and Remove Links</title>
+    <link href="../../font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+    <script src="../../jquery.cytoscape.js-toolbar.js"></script>
+
+    <style>
+        body {
+            font-family: helvetica;
+            font-size: 14px;
+            width: 900px;
+            margin: 0 auto;
+        }
+
+        #cy {
+            width: 600px;
+            height: 600px;
+            border: 1px solid #888;
+        }
+    </style>
+
+    <script>
+        $(function () {
+            $('#cy').cytoscape({
+                ready: function () {
+                    window.cy = this;
+                },
+
+                style: [
+                    {
+                        selector: 'node',
+                        css: {
+                            'content': 'data(name)'
+                        }
+                    },
+
+                    {
+                        selector: 'edge',
+                        css: {
+                            'target-arrow-shape': 'triangle'
+                        }
+                    },
+
+                    // custom classes
+                    {
+                        selector: '.selected-node',
+                        css: {
+                            'border-color': '#f00',
+                            'border-width': '2px'
+                        }
+                    },
+                ],
+
+                elements: {
+                    nodes: [
+                        { data: { id: 'j', name: 'Jerry' } },
+                        { data: { id: 'e', name: 'Elaine' } },
+                        { data: { id: 'k', name: 'Kramer' } },
+                        { data: { id: 'g', name: 'George' } }
+                    ],
+                    edges: []
+                },
+            });
+
+            $('#cy').cytoscapeToolbar({
+                tools: [
+			        [
+				        {
+				            icon: 'fa fa-link',
+				            event: ['tap'],
+				            selector: 'node',
+				            bubbleToCore: false,
+				            tooltip: 'Link',
+				            action: [performLink]
+				        },
+				        {
+				            icon: 'fa fa-unlink',
+				            event: ['tap'],
+				            selector: 'edge',
+				            bubbleToCore: false,
+				            tooltip: 'Unlink',
+				            action: [performUnlink]
+				        }
+			        ]
+                ],
+                appendTools: false
+            });
+
+            //#region linking
+            var src;
+            function performLink(e) {
+                if (!e.data.canPerform(e, performLink)) {
+                    return;
+                }
+
+                if (src) {
+                    tgt = e.cyTarget;
+
+                    e.cy.add({
+                        group: "edges",
+                        data: {
+                            source: src.id(),
+                            target: tgt.id()
+                        }
+                    });
+
+                    src.removeClass('selected-node');
+                    src = undefined;
+                } else {
+                    src = e.cyTarget;
+                    src.addClass('selected-node');
+                }
+            }
+
+            function performUnlink(e) {
+                if (!e.data.canPerform(e, performUnlink)) {
+                    return;
+                }
+
+                cy.remove(e.cyTarget);
+            }
+
+            function getLinkName(src, tgt) {
+                return src.id() + "->" + tgt.id();
+            }
+            //#endregion
+        });
+    </script>
+</head>
+<body>
+    <h1>Cytoscape.js Toolbar Demo</h1>
+
+    <div id="cy"></div>
+</body>
+</html>

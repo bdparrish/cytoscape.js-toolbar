@@ -95,6 +95,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="demos\links\index.html" />
+    <Content Include="demos\nodes\index.html" />
     <Content Include="font-awesome-4.0.3\css\font-awesome.css" />
     <Content Include="font-awesome-4.0.3\css\font-awesome.min.css" />
     <Content Include="font-awesome-4.0.3\fonts\fontawesome-webfont.svg" />
