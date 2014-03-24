@@ -95,6 +95,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="demos\kitchen-sink.html" />
     <Content Include="demos\links\index.html" />
     <Content Include="demos\nodes\index.html" />
     <Content Include="font-awesome-4.0.3\css\font-awesome.css" />
