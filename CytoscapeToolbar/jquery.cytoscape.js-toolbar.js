@@ -94,7 +94,7 @@
 				}
 			]
 		],
-		appendTools: true, // set whether or not to append your custom tools list to the default tools list
+		appendTools: false, // set whether or not to append your custom tools list to the default tools list
 		position: 'left', // set position of toolbar (right, left)
 		toolbarClass: 'ui-cytoscape-toolbar', // set a class name for the toolbar to help with styling
 		multipleToolsClass: 'tool-item-list', // set a class name for the tools that should be shown in the same position
@@ -212,9 +212,7 @@
 	            var finalToolsList = defaults.tools;
 
 	            for (var i = 0; i < options.tools.length; i++) {
-	                if ($.inArray(options.tools[i], finalToolsList) == -1) {
-	                    finalToolsList.push(options.tools[i]);
-	                }
+	                finalToolsList.push(options.tools[i]);
 	            }
 
 	            options.tools = finalToolsList;
