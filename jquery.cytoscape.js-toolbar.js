@@ -241,18 +241,22 @@ function pan(core, direction, factors) {
 		        options.tools = params.tools;
 		    }
 
-		    if (options.appendTools && options.tools) {
-	            var finalToolsList = [];
+		    if (options.appendTools) {
+		        if (!options.tools) {
+		            options.tools = defaults.tools;
+		        } else {
+		            var finalToolsList = [];
 
-	            for (var d = 0; d < defaults.tools.length; d++) {
-	            	finalToolsList.push(defaults.tools[d]);
-	            }
+		            for (var d = 0; d < defaults.tools.length; d++) {
+		            	finalToolsList.push(defaults.tools[d]);
+		            }
 
-	            for (var i = 0; i < options.tools.length; i++) {
-	                finalToolsList.push(options.tools[i]);
-	            }
+		            for (var i = 0; i < options.tools.length; i++) {
+		                finalToolsList.push(options.tools[i]);
+		            }
 
-	            options.tools = finalToolsList;
+		            options.tools = finalToolsList;
+		        }
 		    } else {
 	            options.tools = defaults.tools;
 		    }
