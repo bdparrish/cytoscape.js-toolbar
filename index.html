@@ -1,58 +1,13 @@
 ﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title></title>
-    <link href="font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/2.3.7/cytoscape.min.js"></script>
-    <script type="text/javascript" src="jquery.cytoscape.js-toolbar.js"></script>
-
-    <style>
-        body {
-            font-family: helvetica;
-            font-size: 14px;
-            width: 900px;
-            margin: 0 auto;
-        }
-
-        #cy {
-            width: 600px;
-            height: 600px;
-            border: 1px solid #888;
-        }
-    </style>
-
-    <script>
-        $(function () {
-            $('#cy').cytoscape({
-                ready: function () {
-                    window.cy = this;
-                },
-
-                style: [
-                    {
-                        selector: 'node',
-                        css: {
-                            'content': 'data(name)'
-                        }
-                    },
-
-                    {
-                        selector: 'edge',
-                        css: {
-                            'target-arrow-shape': 'triangle'
-                        }
-                    }
-                ]
-            });
-
-            $('#cy').cytoscapeToolbar();
-        });
-    </script>
+    <title>Cytoscape Toolbar Demo</title>
 </head>
 <body>
     <h1>Cytoscape.js Toolbar Demo</h1>
 
-    <div id="cy"></div>
+    <ul>
+        <li><a href="demos/kitchen-sink.html">Kitchen Sink</a></li>
+    </ul>
 </body>
 </html>

@@ -198,340 +198,359 @@
 	}
     //#endregion
 
-	$.fn.cytoscapeToolbar = function (params) {
-	    var options = $.extend(true, {}, defaults, params);
+	// registers the extension on a cytoscape lib ref
+	var register = function( cytoscape, $ ) {
 
-	    if (params) {
-	        options.tools = params.tools;
-	    }
+		if( !cytoscape ) {
+			return;
+		} // can't register if cytoscape unspecified
 
-	    if (options.appendTools) {
-	        if (!options.tools) {
-	            options.tools = defaults.tools;
-	        } else {
-	            var finalToolsList = defaults.tools;
+		cytoscape('core', 'toolbar', function(params) {
+		    var options = $.extend(true, {}, defaults, params);
 
-	            for (var i = 0; i < options.tools.length; i++) {
-	                finalToolsList.push(options.tools[i]);
-	            }
+		    if (params) {
+		        options.tools = params.tools;
+		    }
 
-	            options.tools = finalToolsList;
-	        }
-	    }
+		    if (options.appendTools) {
+		        if (!options.tools) {
+		            options.tools = defaults.tools;
+		        } else {
+		            var finalToolsList = defaults.tools;
 
-		var fn = params;
-		var $container = $('#' + options.cyContainer);
-		var cy;
-		var hoveredTool;
+		            for (var i = 0; i < options.tools.length; i++) {
+		                finalToolsList.push(options.tools[i]);
+		            }
 
-		var functions = {
-			destroy: function () {
-				var data = $(this).data('cytoscapeToolbar');
-				var options = data.options;
-				var handlers = data.handlers;
-				var cy = data.cy;
+		            options.tools = finalToolsList;
+		        }
+		    }
 
-				// remove bound cy handlers
-				for (var i = 0; i < handlers.length; i++) {
-					var handler = handlers[i];
-					cy.off(handler.events, handler.selector, handler.fn);
-				}
+			var fn = params;
+			var $container = $( this.container() );
+			var cy;
+			var hoveredTool;
 
-				// remove container from dom
-				data.$container.remove();
-			},
+			var functions = {
+				destroy: function () {
+					var data = $(this).data('cytoscapeToolbar');
+					var options = data.options;
+					var handlers = data.handlers;
+					var cy = data.cy;
 
-			canPerform: function (e, fn) {
-				var toolIndexes = e.data.data.selectedTool;
-				var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
-				var handlerIndex = e.data.handlerIndex;
-
-				if (!(toolIndexes === undefined) && $.inArray(fn, tool.action) > -1) {
-					var selector = e.data.data.handlers[handlerIndex].selector;
-
-					switch (selector) {
-						case 'node':
-							return e.cyTarget.isNode();
-						case 'edge':
-						    return e.cyTarget.isEdge();
-					    case 'node,edget':
-					    case 'edge,node':
-					        return e.cyTarget.isNode() || e.cyTarget.isEdge();
-						case 'cy':
-							return e.cyTarget == cy || tool.bubbleToCore;
+					// remove bound cy handlers
+					for (var i = 0; i < handlers.length; i++) {
+						var handler = handlers[i];
+						cy.off(handler.events, handler.selector, handler.fn);
 					}
-				}
 
-				return false;
-			},
+					// remove container from dom
+					data.$container.remove();
+				},
 
-			init: function () {
-				// check for a mobile device
-				var browserIsMobile = 'ontouchstart' in window;
+				canPerform: function (e, fn) {
+					var toolIndexes = e.data.data.selectedTool;
+					var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
+					var handlerIndex = e.data.handlerIndex;
 
-				// **** REMOVE THIS CHECK IF YOU DON'T CARE ABOUT SHOWING IT IN MOBILE 
-				// don't do anything because this plugin hasn't been tested for mobile
-				if (browserIsMobile && options.autodisableForMobile) {
-					return $(this);
-				}
+					if (!(toolIndexes === undefined) && $.inArray(fn, tool.action) > -1) {
+						var selector = e.data.data.handlers[handlerIndex].selector;
 
-				// setup an object to hold data needed for the future
-				var data = {
-					selectedTool: undefined,
-					options: options,
-					handlers: []
-				};
+						switch (selector) {
+							case 'node':
+								return e.cyTarget.isNode();
+							case 'edge':
+							    return e.cyTarget.isEdge();
+						    case 'node,edget':
+						    case 'edge,node':
+						        return e.cyTarget.isNode() || e.cyTarget.isEdge();
+							case 'cy':
+								return e.cyTarget == cy || tool.bubbleToCore;
+						}
+					}
 
-				// setup default css values
-				var cssOptions = {
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					width: 0,
-					height: 0,
-					minWidth: 0,
-					minHeight: 0,
-					maxWidth: 0,
-					maxHeight: 0,
-					zIndex: options.zIndex
-				};
+					return false;
+				},
 
-				// check for toolbar position to calculate CSS position values
-				if (options.position === 'top') {
-					cssOptions.top = $container.offset().top - 45;
-					cssOptions.left = $container.offset().left;
-					cssOptions.width = $container.outerWidth(true);
-					cssOptions.minWidth = $container.outerWidth(true);
-					cssOptions.maxWidth = $container.outerWidth(true);
-				} else if (options.position === 'bottom') {
-					cssOptions.top = $container.offset().top + $container.outerHeight(true);
-					cssOptions.left = $container.offset().left;
-					cssOptions.width = $container.outerWidth(true);
-					cssOptions.minWidth = $container.outerWidth(true);
-					cssOptions.maxWidth = $container.outerWidth(true);
-				} else if (options.position === 'left') {
-					cssOptions.top = $container.offset().top;
-					cssOptions.left = $container.offset().left - 45;
-					cssOptions.height = $container.outerHeight(true);
-					cssOptions.minHeight = $container.outerHeight(true);
-					cssOptions.maxHeight = $container.outerHeight(true);
-				} else { // default - it is either 'right' or it is something we don't know so we use the default value of 'right'
-					cssOptions.top = $container.offset().top;
-					cssOptions.left = $container.offset().left + $container.outerWidth(true);
-					cssOptions.height = $container.outerHeight(true);
-					cssOptions.minHeight = $container.outerHeight(true);
-					cssOptions.maxHeight = $container.outerHeight(true);
-				}
+				init: function () {
+					// check for a mobile device
+					var browserIsMobile = 'ontouchstart' in window;
 
-				// create toolbar element with applied css
-				var $toolbar = $('<div class="' + options.toolbarClass + '"></div>')
-									.css(cssOptions)
-				data.$container = $toolbar;
+					// **** REMOVE THIS CHECK IF YOU DON'T CARE ABOUT SHOWING IT IN MOBILE 
+					// don't do anything because this plugin hasn't been tested for mobile
+					if (browserIsMobile && options.autodisableForMobile) {
+						return $(this);
+					}
 
-				$toolbar.appendTo('body');
+					// setup an object to hold data needed for the future
+					var data = {
+						selectedTool: undefined,
+						options: options,
+						handlers: []
+					};
 
-				$.each(options.tools, function (toolListIndex, toolList) {
-					var $toolListWrapper = $('<div class="' + options.multipleToolsClass + '-wrapper"></div>')
+					// setup default css values
+					var cssOptions = {
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						width: 0,
+						height: 0,
+						minWidth: 0,
+						minHeight: 0,
+						maxWidth: 0,
+						maxHeight: 0,
+						zIndex: options.zIndex
+					};
+
+					// check for toolbar position to calculate CSS position values
+					if (options.position === 'top') {
+						cssOptions.top = $container.offset().top - 45;
+						cssOptions.left = $container.offset().left;
+						cssOptions.width = $container.outerWidth(true);
+						cssOptions.minWidth = $container.outerWidth(true);
+						cssOptions.maxWidth = $container.outerWidth(true);
+					} else if (options.position === 'bottom') {
+						cssOptions.top = $container.offset().top + $container.outerHeight(true);
+						cssOptions.left = $container.offset().left;
+						cssOptions.width = $container.outerWidth(true);
+						cssOptions.minWidth = $container.outerWidth(true);
+						cssOptions.maxWidth = $container.outerWidth(true);
+					} else if (options.position === 'left') {
+						cssOptions.top = $container.offset().top;
+						cssOptions.left = $container.offset().left - 45;
+						cssOptions.height = $container.outerHeight(true);
+						cssOptions.minHeight = $container.outerHeight(true);
+						cssOptions.maxHeight = $container.outerHeight(true);
+					} else { // default - it is either 'right' or it is something we don't know so we use the default value of 'right'
+						cssOptions.top = $container.offset().top;
+						cssOptions.left = $container.offset().left + $container.outerWidth(true);
+						cssOptions.height = $container.outerHeight(true);
+						cssOptions.minHeight = $container.outerHeight(true);
+						cssOptions.maxHeight = $container.outerHeight(true);
+					}
+
+					// create toolbar element with applied css
+					var $toolbar = $('<div class="' + options.toolbarClass + '"></div>')
+										.css(cssOptions)
+					data.$container = $toolbar;
+
+					$toolbar.appendTo('body');
+
+					$.each(options.tools, function (toolListIndex, toolList) {
+						var $toolListWrapper = $('<div class="' + options.multipleToolsClass + '-wrapper"></div>')
+													.css({
+														width: 45,
+														height: 45,
+														position: 'relative',
+														overflow: 'hidden',
+														float: 'left'
+													});
+
+						$toolbar.append($toolListWrapper);
+
+						if (toolList.length > 1) {
+							var $moreArrow = $('<span class="fa fa-caret-right"></span>')
 												.css({
-													width: 45,
-													height: 45,
-													position: 'relative',
-													overflow: 'hidden',
-													float: 'left'
+													'background-color': 'transparent',
+													position: 'absolute',
+													top: 28,
+													left: 35,
+													zIndex: 9999
 												});
-
-					$toolbar.append($toolListWrapper);
-
-					if (toolList.length > 1) {
-						var $moreArrow = $('<span class="fa fa-caret-right"></span>')
-											.css({
-												'background-color': 'transparent',
-												position: 'absolute',
-												top: 28,
-												left: 35,
-												zIndex: 9999
-											});
-						$toolListWrapper.append($moreArrow);
-					}
-
-					var $toolList = $('<div class="' + options.multipleToolsClass + '"></div>')
-										.css({
-											position: 'absolute',
-											width: toolList.length * 55,
-											height: 45,
-											'background-color': '#ddd'
-										});
-
-					$toolListWrapper.append($toolList);
-
-					$.each(toolList, function (toolIndex, element) {
-						var padding = "";
-
-						if (toolIndex != options.tools.length - 1) {
-							if (options.position === 'top' || options.position === 'bottom') {
-								padding = "padding: 10px 0 10px 10px;";
-							} else if (options.position === 'right' || options.position === 'left') {
-								padding = "padding: 10px 10px 0 10px;";
-							}
-						} else {
-							padding = "padding: 10px;";
+							$toolListWrapper.append($moreArrow);
 						}
 
-						var clazz = options.toolItemClass + ' icon ' + element.icon + ' tooltip';
-						var style = 'cursor: pointer; color: #aaa; width: 35px; height: 35px; font-size: 24px; ' + padding;
+						var $toolList = $('<div class="' + options.multipleToolsClass + '"></div>')
+											.css({
+												position: 'absolute',
+												width: toolList.length * 55,
+												height: 45,
+												'background-color': '#f9f9f9'
+											});
 
-						var jElement = $('<span ' +
-							'id="tool-' + toolListIndex + '-' + toolIndex + '" ' +
-							'class="' + clazz + '" ' +
-							'style="' + style + '" ' +
-							'title="' + element.tooltip + '" ' +
-							'data-tool="' + toolListIndex + ',' + toolIndex + '"' +
-							'></span>');
+						$toolListWrapper.append($toolList);
 
-						data.options.tools[toolListIndex][toolIndex].element = jElement;
+						$.each(toolList, function (toolIndex, element) {
+							var padding = "";
 
-						$toolList.append(jElement);
+							if (toolIndex != options.tools.length - 1) {
+								if (options.position === 'top' || options.position === 'bottom') {
+									padding = "padding: 10px 0 10px 10px;";
+								} else if (options.position === 'right' || options.position === 'left') {
+									padding = "padding: 10px 10px 0 10px;";
+								}
+							} else {
+								padding = "padding: 10px;";
+							}
 
-						var pressTimer;
-						var startTime, endTime;
-						var toolItemLongHold = false;
+							var clazz = options.toolItemClass + ' icon ' + element.icon;
+							var style = 'cursor: pointer; color: #aaa; width: 35px; height: 35px; font-size: 24px; ' + padding;
 
-						jElement
-							.mousedown(function () {
-								startTime = new Date().getTime();
-								endTime = startTime;
+							var jElement = $('<span ' +
+								'id="tool-' + toolListIndex + '-' + toolIndex + '" ' +
+								'class="' + clazz + '" ' +
+								'style="' + style + '" ' +
+								'title="' + element.tooltip + '" ' +
+								'data-tool="' + toolListIndex + ',' + toolIndex + '"' +
+								'></span>');
 
-								pressTimer = window.setTimeout(function () {
-									if (startTime == endTime) {
-										toolItemLongHold = true;
-										$toolListWrapper.css('overflow', 'visible');
+							data.options.tools[toolListIndex][toolIndex].element = jElement;
+
+							$toolList.append(jElement);
+
+							var pressTimer;
+							var startTime, endTime;
+							var toolItemLongHold = false;
+
+							jElement
+								.mousedown(function () {
+									startTime = new Date().getTime();
+									endTime = startTime;
+
+									pressTimer = window.setTimeout(function () {
+										if (startTime == endTime) {
+											toolItemLongHold = true;
+											$toolListWrapper.css('overflow', 'visible');
+										}
+									}, options.longClickTime);
+								})
+								.mouseup(function () {
+									endTime = new Date().getTime();
+
+									if (data.selectedTool != [toolListIndex, toolIndex] && !toolItemLongHold) {
+										if (data.selectedTool != undefined) {
+											data.options.tools[data.selectedTool[0]][data.selectedTool[1]].element.css('color', '#aaa');
+										}
+										data.selectedTool = [toolListIndex, toolIndex];
+										$('.' + options.toolbarClass).find('.selected-tool').css('color','#aaa').removeClass('selected-tool');
+										$(this).addClass('selected-tool').css('color', '#000');
 									}
-								}, options.longClickTime);
-							})
-							.mouseup(function () {
-								endTime = new Date().getTime();
+								});
+							;
 
-								if (data.selectedTool != [toolListIndex, toolIndex] && !toolItemLongHold) {
-									if (data.selectedTool != undefined) {
-										data.options.tools[data.selectedTool[0]][data.selectedTool[1]].element.css('color', '#aaa');
+							$(window)
+								.mouseup(function (e) {
+									if (toolItemLongHold) {
+										var moveLeft = 0;
+										$.each(hoveredTool.parent().children(), function (index, element) {
+											if (hoveredTool.index() == index) {
+												return false;
+											}
+
+											moveLeft += $(element).outerWidth(true);
+										});
+										var indexes = hoveredTool.attr('data-tool').split(',');
+										data.selectedTool = indexes;
+										var offsetLeft = 0 - moveLeft;
+										$toolList.css('left', offsetLeft);
+										$toolListWrapper.css('overflow', 'hidden');
+										$('.' + options.toolbarClass).find('.selected-tool').removeClass('selected-tool');
+										hoveredTool.addClass('selected-tool');
+										clearTimeout(pressTimer);
+										toolItemLongHold = false;
+										startTime = -1;
+										endTime = -1;
+										return false;
 									}
-									data.selectedTool = [toolListIndex, toolIndex];
-									$('.' + options.toolbarClass).find('.selected-tool').removeClass('selected-tool');
-									$(this).addClass('selected-tool');
-									$(this).css('color', '#000');
+								})
+							;
+
+							jElement
+								.hover(function () {
+									hoveredTool = $(this);
+
+									hoveredTool.css('color', '#000');
+								}, function () {
+									if (hoveredTool.hasClass('selected-tool')) {
+										hoveredTool.css('color', '000');
+									} else {
+										hoveredTool.css('color', '#aaa');
+									}
+								})
+							;
+						});
+					});
+
+					var bindings = {
+						on: function (event, selector, action) {
+							var index = data.handlers.push({
+								events: event,
+								selector: selector,
+								action: action
+							});
+
+							var eventData = {
+								data: data,
+								handlerIndex: index - 1,
+								canPerform: functions.canPerform
+							};
+
+							if (selector === 'cy') {
+								cy.bind(event, eventData, action);
+							} else {
+								cy.on(event, selector, eventData, action);
+							}
+
+							return this;
+						}
+					};
+
+					function addEventListeners() {
+						$.each(options.tools, function (index, toolList) {
+							$.each(toolList, function (index, toolElement) {
+								var unequalsLengths = false;
+
+								if (toolElement.event.length != toolElement.action.length) {
+									var tooltip = (toolElement.tooltip) ? toolElement.tooltip : "<no tooltip>";
+									console.log("Unequal lengths for event and action variables on " + index + "-" + tooltip);
+									unequalsLengths = true;
+								}
+
+								if (!unequalsLengths) {
+									for (var i = 0; i < toolElement.event.length; i++) {
+										bindings.on(toolElement.event[i], toolElement.selector, toolElement.action[i]);
+									}
 								}
 							});
-						;
-
-						$(window)
-							.mouseup(function (e) {
-								if (toolItemLongHold) {
-									var moveLeft = 0;
-									$.each(hoveredTool.parent().children(), function (index, element) {
-										if (hoveredTool.index() == index) {
-											return false;
-										}
-
-										moveLeft += $(element).outerWidth(true);
-									});
-									var indexes = hoveredTool.attr('data-tool').split(',');
-									data.selectedTool = indexes;
-									var offsetLeft = 0 - moveLeft;
-									$toolList.css('left', offsetLeft);
-									$toolListWrapper.css('overflow', 'hidden');
-									$('.' + options.toolbarClass).find('.selected-tool').removeClass('selected-tool');
-									hoveredTool.addClass('selected-tool');
-									clearTimeout(pressTimer);
-									toolItemLongHold = false;
-									startTime = -1;
-									endTime = -1;
-									return false;
-								}
-							})
-						;
-
-						jElement
-							.hover(function () {
-								hoveredTool = $(this);
-
-								hoveredTool.css('color', '#000');
-							}, function () {
-								if (hoveredTool.hasClass('selected-tool')) {
-									hoveredTool.css('color', '000');
-								} else {
-									hoveredTool.css('color', '#aaa');
-								}
-							})
-						;
-					});
-				});
-
-				var bindings = {
-					on: function (event, selector, action) {
-						var index = data.handlers.push({
-							events: event,
-							selector: selector,
-							action: action
 						});
-
-						var eventData = {
-							data: data,
-							handlerIndex: index - 1,
-							canPerform: functions.canPerform
-						};
-
-						if (selector === 'cy') {
-							cy.bind(event, eventData, action);
-						} else {
-							cy.on(event, selector, eventData, action);
-						}
-
-						return this;
 					}
-				};
 
-				function addEventListeners() {
-					$.each(options.tools, function (index, toolList) {
-						$.each(toolList, function (index, toolElement) {
-							var unequalsLengths = false;
+					$container.cytoscape(function (e) {
+						cy = this;
+						data.cy = cy;
 
-							if (toolElement.event.length != toolElement.action.length) {
-								var tooltip = (toolElement.tooltip) ? toolElement.tooltip : "<no tooltip>";
-								console.log("Unequal lengths for event and action variables on " + index + "-" + tooltip);
-								unequalsLengths = true;
-							}
+						addEventListeners();
 
-							if (!unequalsLengths) {
-								for (var i = 0; i < toolElement.event.length; i++) {
-									bindings.on(toolElement.event[i], toolElement.selector, toolElement.action[i]);
-								}
-							}
-						});
+						$container.data('cytoscapeToolbar', data);
 					});
 				}
+			};
 
-				$container.cytoscape(function (e) {
-					cy = this;
-					data.cy = cy;
-
-					addEventListeners();
-
-					$container.data('cytoscapeToolbar', data);
-				});
+			if (functions[fn]) {
+				return functions[fn].apply(this, Array.prototype.slice.call(arguments, 1));
+			} else if (typeof fn == 'object' || !fn) {
+				return functions.init.apply(this, arguments);
+			} else {
+				$.error("No such function `" + fn + "` for jquery.cytoscapeToolbar");
 			}
-		};
 
-		if (functions[fn]) {
-			return functions[fn].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof fn == 'object' || !fn) {
-			return functions.init.apply(this, arguments);
-		} else {
-			$.error("No such function `" + fn + "` for jquery.cytoscapeToolbar");
-		}
+			return $(this);
+		}); // cytoscape()
+	}; // register
 
-		return $(this);
-	};
+	if( typeof module !== 'undefined' && module.exports ){ // expose as a commonjs module
+		module.exports = register;
+	}
 
-	$.fn.cyToolbar = $.fn.cytoscapeToolbar;
+	if( typeof define !== 'undefined' && define.amd ){ // expose as an amd/requirejs module
+		define('cytoscape-toolbar', function(){
+			return register;
+		});
+	}
+
+	if( typeof cytoscape !== 'undefined' ){ // expose to global cytoscape (i.e. window.cytoscape)
+		register( cytoscape, $ );
+	}
 
 })(jQuery);
