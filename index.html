@@ -2,12 +2,171 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Cytoscape Toolbar Demo</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+    ul {
+        list-style: none;
+    }
+    </style>
 </head>
 <body>
-    <h1>Cytoscape.js Toolbar Demo</h1>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Cytoscape.js Toolbar Demo</h1>
+        </div>
 
-    <ul>
-        <li><a href="demos/kitchen-sink.html">Kitchen Sink</a></li>
-    </ul>
+        <h2>Demos</h2>
+        <ul class="nav nav-pills">
+            <li role="presentation"><a href="demos/kitchen-sink.html">Kitchen Sink</a></li>
+            <li role="presentation"><a href="demos/assets.html">Assets Network (Walkthrough)</a></li>
+        </ul>
+
+        <div id="documentation-content" class="row">
+            <!-- Documentation -->
+            <div class="col-md-12">
+                <h2 id="documentation">Documentation</h2>
+                <h3>Toolbar</h3>
+                <h4>params</h4>
+                <ul>
+                    <li><code>cyContainer:</code> - (String) id being used for cytoscape core instance</li>
+                    <li><code>tools:</code> - (Object) an array of tools to list in the toolbar</li>
+                    <li><code>appendTools:</code> - (Boolean) set whether or not to append your custom tools list to the default tools list</li>
+                    <li><code>position:</code> - (Enum) set position of toolbar ('right', 'left', 'top', 'bottom')</li>
+                    <li><code>toolbarClass:</code> - (String) set a class name for the toolbar to help with styling</li>
+                    <li><code>multipleToolsClass:</code> - (String) set a class name for the tools that should be shown in the same position</li>
+                    <li><code>toolItemClass:</code> - (String) set a class name for a toolbar item to help with styling</li>
+                    <li><code>autodisableForMobile:</code> - (Boolean) disable the toolbar completely for mobile (since we don't really need it with gestures like pinch to zoom)</li>
+                    <li><code>zIndex:</code> - (Integer) the z-index of the ui div</li>
+                    <li><code>longClickTime:</code> - (Integer) time until a multi-tool list will present other tools</li>
+                </ul>
+                <h4>defaults</h4>
+                <pre><code class="javascript">
+var defaults = {
+    cyContainer: 'cy',
+    tools: [
+        [
+            {
+                icon: 'fa fa-search-plus',
+                event: ['tap'],
+                selector: 'cy',
+                options: {
+                    cy: {
+                        zoom: 0.1,
+                        minZoom: 0.1,
+                        maxZoom: 10,
+                        zoomDelay: 45
+                    }
+                },
+                bubbleToCore: false,
+                tooltip: 'Zoom In',
+                action: [performZoomIn]
+            }
+        ],
+        [
+            {
+                icon: 'fa fa-search-minus',
+                event: ['tap'],
+                selector: 'cy',
+                options: {
+                    cy: {
+                        zoom: -0.1,
+                        minZoom: 0.1,
+                        maxZoom: 10,
+                        zoomDelay: 45
+                    }
+                },
+                bubbleToCore: false,
+                tooltip: 'Zoom Out',
+                action: [performZoomOut]
+            }
+        ],
+        [
+            {
+                icon: 'fa fa-arrow-right',
+                event: ['tap'],
+                selector: 'cy',
+                options: {
+                    cy: {
+                        distance: -80,
+                    }
+                },
+                bubbleToCore: true,
+                tooltip: 'Pan Right',
+                action: [performPanRight]
+            }
+        ],
+        [
+            {
+                icon: 'fa fa-arrow-down',
+                event: ['tap'],
+                selector: 'cy',
+                options: {
+                    cy: {
+                        distance: -80,
+                    }
+                },
+                bubbleToCore: true,
+                tooltip: 'Pan Down',
+                action: [performPanDown]
+            }
+        ],
+        [
+            {
+                icon: 'fa fa-arrow-left',
+                event: ['tap'],
+                selector: 'cy',
+                options: {
+                    cy: {
+                        distance: 80,
+                    }
+                },
+                bubbleToCore: true,
+                tooltip: 'Pan Left',
+                action: [performPanLeft]
+            }
+        ],
+        [
+            {
+                icon: 'fa fa-arrow-up',
+                event: ['tap'],
+                selector: 'cy',
+                options: {
+                    cy: {
+                        distance: 80,
+                    }
+                },
+                bubbleToCore: true,
+                tooltip: 'Pan Up',
+                action: [performPanUp]
+            }
+        ]
+    ],
+    appendTools: false,
+    position: 'left',
+    toolbarClass: 'ui-cytoscape-toolbar',
+    multipleToolsClass: 'tool-item-list',
+    toolItemClass: 'tool-item',
+    autodisableForMobile: true,
+    zIndex: 9999,
+    longClickTime: 325
+};
+                </code></pre>
+                <h3>Tool</h3>
+                <h4>params</h4>
+                <ul id="documentation">
+                    <li><code>icon:</code> - (String) icon from font-awesome-4.0.3, if you want to use something else, then this becomes a class specific for this tool item</li>
+                    <li><code>event:</code> - (Array) array of cytoscape events that correlates with action variable</li>
+                    <li><code>selector:</code> - (String) cytoscape selector (cy = core instance, node, edge) - currently not supporting full selection selectors from the documentation</li>
+                    <li><code>options:</code> - (Object) pass through different parameters for separate selectors</li>
+                    <li><code>bubbleToCore:</code> - (Boolean) say whether or not the event should be performed if the core instance was not clicked</li>
+                    <li><code>tooltip:</code> - (String) value for the title attribute of a span element</li>
+                    <li><code>action:</code> - (Array) array of action methods that correlates with the event variable</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/js/bootstrap.min.js"></script>
 </html>

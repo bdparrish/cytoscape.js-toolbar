@@ -1,5 +1,113 @@
-﻿(function ($) {
+﻿// zooming
+function performZoomIn(e) {
+	console.log("performing zoom in");
+	performZoom(e, performZoomIn);
+}
 
+function performZoomOut(e) {
+	console.log("performing zoom out");
+	performZoom(e, performZoomOut);
+}
+
+function performZoom(e, action) {
+	if (!e.data.canPerform(e, action)) {
+		console.log("could not perform zoom");
+
+		return;
+	}
+
+	var toolIndexes = e.data.data.selectedTool;
+	var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
+
+	zoomGraph(e.cy, e.originalEvent.offsetX, e.originalEvent.offsetY, tool.options.cy);
+}
+
+function zoomGraph(core, x, y, factors) {
+	console.log("zooming:");
+	console.log({ x : x, y : y, factors : factors });
+
+	var factor = 1 + factors.zoom;
+
+	var zoom = core.zoom();
+
+	var lvl = zoom * factor;
+
+	if (lvl < factors.minZoom) {
+		lvl = factors.minZoom;
+	}
+
+	if (lvl > factors.maxZoom) {
+		lvl = factors.maxZoom;
+	}
+
+	if ((lvl == factors.maxZoom && zoom == factors.maxZoom) ||
+		(lvl == factors.minZoom && zoom == factors.minZoom)
+	) {
+		return;
+	}
+
+	zoomTo(core, x, y, lvl);
+}
+
+var zx, zy;
+function zoomTo(core, x, y, level) {
+	core.zoom({
+		level: level,
+		renderedPosition: { x: x, y: y }
+	});
+}
+// end zooming
+
+// panning
+function performPanRight(e) {
+	console.log("performing pan right");
+	performPan(e, performPanRight, 0);
+}
+
+function performPanDown(e) {
+	console.log("performing pan down");
+	performPan(e, performPanDown, 1);
+}
+
+function performPanLeft(e) {
+	console.log("performing pan left");
+	performPan(e, performPanLeft, 2);
+}
+
+function performPanUp(e) {
+	console.log("performing pan up");
+	performPan(e, performPanUp, 3);
+}
+
+function performPan(e, action, direction) {
+	if (!e.data.canPerform(e, action)) {
+	console.log("could not perform pan");
+		return;
+	}
+
+	console.log("performing pan");
+
+	var toolIndexes = e.data.data.selectedTool;
+	var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
+
+	pan(e.cy, direction, tool.options.cy);
+}
+
+function pan(core, direction, factors) {
+	switch (direction) {
+		case 0:
+		case 2:
+			core.panBy({ x: factors.distance, y: 0 });
+			break;
+		case 1:
+		case 3:
+			core.panBy({ x: 0, y: factors.distance });
+			break;
+	}
+}
+// end panning
+
+(function ($) {
 	var defaults = {
 		cyContainer: 'cy', // id being used for cytoscape core instance
 		tools: [ // an array of tools to list in the toolbar
@@ -52,7 +160,9 @@
 					bubbleToCore: true,
 					tooltip: 'Pan Right',
 					action: [performPanRight]
-				},
+				}
+			],
+			[
 				{
 					icon: 'fa fa-arrow-down',
 					event: ['tap'],
@@ -65,7 +175,9 @@
 					bubbleToCore: true,
 					tooltip: 'Pan Down',
 					action: [performPanDown]
-				},
+				}
+			],
+			[
 				{
 					icon: 'fa fa-arrow-left',
 					event: ['tap'],
@@ -78,7 +190,9 @@
 					bubbleToCore: true,
 					tooltip: 'Pan Left',
 					action: [performPanLeft]
-				},
+				}
+			],
+			[
 				{
 					icon: 'fa fa-arrow-up',
 					event: ['tap'],
@@ -98,115 +212,28 @@
 		position: 'left', // set position of toolbar (right, left)
 		toolbarClass: 'ui-cytoscape-toolbar', // set a class name for the toolbar to help with styling
 		multipleToolsClass: 'tool-item-list', // set a class name for the tools that should be shown in the same position
-		toolItemClass: 'tool-item', //set a class name for a toolbar item to help with styling
+		toolItemClass: 'tool-item', // set a class name for a toolbar item to help with styling
 		autodisableForMobile: true, // disable the toolbar completely for mobile (since we don't really need it with gestures like pinch to zoom)
 		zIndex: 9999, // the z-index of the ui div
-        longClickTime: 325 // time until a multi-tool list will present other tools
+		longClickTime: 325 // time until a multi-tool list will present other tools
 	};
 
-	//#region zooming
-	function performZoomIn(e) {
-		performZoom(e, performZoomIn);
-	}
-
-	function performZoomOut(e) {
-		performZoom(e, performZoomOut);
-	}
-
-	function performZoom(e, action) {
-		if (!e.data.canPerform(e, action)) {
-			return;
-		}
-
-		var toolIndexes = e.data.data.selectedTool;
-		var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
-
-		zoomGraph(e.cy, e.originalEvent.offsetX, e.originalEvent.offsetY, tool.options.cy);
-	}
-
-	function zoomGraph(core, x, y, factors) {
-		var factor = 1 + factors.zoom;
-
-		var zoom = cy.zoom();
-		var lvl = cy.zoom() * factor;
-
-		if (lvl < factors.minZoom) {
-			lvl = factors.minZoom;
-		}
-
-		if (lvl > factors.maxZoom) {
-			lvl = factors.maxZoom;
-		}
-
-		if ((lvl == factors.maxZoom && zoom == factors.maxZoom) ||
-			(lvl == factors.minZoom && zoom == factors.minZoom)
-		) {
-			return;
-		}
-
-		zoomTo(core, x, y, lvl);
-	}
-
-	var zx, zy;
-	function zoomTo(core, x, y, level) {
-		core.zoom({
-			level: level,
-			renderedPosition: { x: x, y: y }
-		});
-	}
-	//#endregion
-
-	//#region panning
-	function performPanRight(e) {
-		performPan(e, performPanRight, 0);
-	}
-
-	function performPanDown(e) {
-		performPan(e, performPanDown, 1);
-	}
-
-	function performPanLeft(e) {
-		performPan(e, performPanLeft, 2);
-	}
-
-	function performPanUp(e) {
-		performPan(e, performPanUp, 3);
-	}
-
-	function performPan(e, action, direction) {
-		if (!e.data.canPerform(e, action)) {
-			return;
-		}
-
-		var toolIndexes = e.data.data.selectedTool;
-		var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
-
-		pan(e.cy, direction, tool.options.cy);
-	}
-
-	function pan(core, direction, factors) {
-		switch (direction) {
-			case 0:
-			case 2:
-				core.panBy({ x: factors.distance, y: 0 });
-				break;
-			case 1:
-			case 3:
-				core.panBy({ x: 0, y: factors.distance });
-				break;
-		}
-	}
-    //#endregion
+	console.log("creating cytoscape-toolbar with defaults:");
+	console.log(defaults);
 
 	// registers the extension on a cytoscape lib ref
 	var register = function( cytoscape, $ ) {
-
 		if( !cytoscape ) {
+			console.log("cytoscape is not defined");
+
 			return;
 		} // can't register if cytoscape unspecified
 
 		cytoscape('core', 'toolbar', function(params) {
 		    var options = $.extend(true, {}, defaults, params);
+
+		    console.log("final cytoscape-toolbar options:");
+		    console.log(options);
 
 		    if (params) {
 		        options.tools = params.tools;
@@ -216,7 +243,11 @@
 		        if (!options.tools) {
 		            options.tools = defaults.tools;
 		        } else {
-		            var finalToolsList = defaults.tools;
+		            var finalToolsList = [];
+
+		            for (var d = 0; d < defaults.tools.length; d++) {
+		            	finalToolsList.push(defaults.tools[d]);
+		            }
 
 		            for (var i = 0; i < options.tools.length; i++) {
 		                finalToolsList.push(options.tools[i]);
@@ -249,6 +280,10 @@
 				},
 
 				canPerform: function (e, fn) {
+					if (!e.data.data.selectedTool) {
+						return false;
+					}
+
 					var toolIndexes = e.data.data.selectedTool;
 					var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
 					var handlerIndex = e.data.handlerIndex;
