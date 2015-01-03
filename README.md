@@ -136,7 +136,7 @@ Default Tools
 	}
 ]
 ```
-- Panning =
+- Pan Right =
 ```javascript
 [
 	{
@@ -151,7 +151,12 @@ Default Tools
 		bubbleToCore: true,
 		tooltip: 'Pan Right',
 		action: [performPanRight]
-	},
+	}
+]
+```
+- Pan Down =
+```javascript
+[
 	{
 		icon: 'fa fa-arrow-down',
 		event: ['tap'],
@@ -164,7 +169,12 @@ Default Tools
 		bubbleToCore: true,
 		tooltip: 'Pan Down',
 		action: [performPanDown]
-	},
+	}
+]
+```
+- Pan Left =
+```javascript
+[
 	{
 		icon: 'fa fa-arrow-left',
 		event: ['tap'],
@@ -177,7 +187,12 @@ Default Tools
 		bubbleToCore: true,
 		tooltip: 'Pan Left',
 		action: [performPanLeft]
-	},
+	}
+]
+```
+- Pan Up =
+```javascript
+[
 	{
 		icon: 'fa fa-arrow-up',
 		event: ['tap'],
