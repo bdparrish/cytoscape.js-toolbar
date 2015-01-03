@@ -13,15 +13,15 @@ Quick Start
 Add the following into the head of your page, and make sure that you have included the [Font Awesome 4.0.3](http://fontawesome.io/) as an available CSS file.
 
 ```html
-<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-<script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/2.3.7/cytoscape.js"></script>
 <script src='jquery.cytoscape.js-toolbar.js' /></script>
 ```
 
 Now add a DIV element to your page and give it an id that you can reference in jQuery.
 
 ```html
-<div id="cy"></div>
+<div id="cy-default" class="row cy"></div>
 ```
 
 Finally create your script to setup your cytoscape instance and then add the toolbar
@@ -29,33 +29,21 @@ Finally create your script to setup your cytoscape instance and then add the too
 ```html
 <script>
     $(function () {
-        $('#cy').cytoscape({
-            ready: function () {
-                window.cy = this;
-            },
-            style: [
-              {
-                  selector: 'node',
-                  css: {
-                      'content': 'data(name)'
-                  }
-              },
-              {
-                  selector: 'edge',
-                  css: {
-                    'target-arrow-shape': 'triangle'
-                  }
-              }
-            ]
+        var cyDefault = window.cyDefault = cytoscape({
+            container: document.getElementById('cy-default'),
+
+            // removed for brevity
         });
 
-        $('#cy').cytoscapeToolbar();
+        cyDefault.toolbar();
     });
 </script>
 ```
 
 Options
 =======
+
+***All documentation is available in the index.html, also check out the Kitchen Sink demo for further understanding***
 
 The following are the default options for the toolbar:
 
