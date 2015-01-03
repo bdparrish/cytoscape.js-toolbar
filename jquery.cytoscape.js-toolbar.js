@@ -209,7 +209,7 @@ function pan(core, direction, factors) {
 			]
 		],
 		appendTools: false, // set whether or not to append your custom tools list to the default tools list
-		position: 'left', // set position of toolbar (right, left)
+		position: 'left', // set position of toolbar (right, left, up, down)
 		toolbarClass: 'ui-cytoscape-toolbar', // set a class name for the toolbar to help with styling
 		multipleToolsClass: 'tool-item-list', // set a class name for the tools that should be shown in the same position
 		toolItemClass: 'tool-item', // set a class name for a toolbar item to help with styling
@@ -236,25 +236,25 @@ function pan(core, direction, factors) {
 		    console.log(options);
 
 		    if (params) {
+		    	if (params.tools === undefined) { params.tools = []; }
+
 		        options.tools = params.tools;
 		    }
 
-		    if (options.appendTools) {
-		        if (!options.tools) {
-		            options.tools = defaults.tools;
-		        } else {
-		            var finalToolsList = [];
+		    if (options.appendTools && options.tools) {
+	            var finalToolsList = [];
 
-		            for (var d = 0; d < defaults.tools.length; d++) {
-		            	finalToolsList.push(defaults.tools[d]);
-		            }
+	            for (var d = 0; d < defaults.tools.length; d++) {
+	            	finalToolsList.push(defaults.tools[d]);
+	            }
 
-		            for (var i = 0; i < options.tools.length; i++) {
-		                finalToolsList.push(options.tools[i]);
-		            }
+	            for (var i = 0; i < options.tools.length; i++) {
+	                finalToolsList.push(options.tools[i]);
+	            }
 
-		            options.tools = finalToolsList;
-		        }
+	            options.tools = finalToolsList;
+		    } else {
+	            options.tools = defaults.tools;
 		    }
 
 			var fn = params;
@@ -351,15 +351,15 @@ function pan(core, direction, factors) {
 						cssOptions.width = $container.outerWidth(true);
 						cssOptions.minWidth = $container.outerWidth(true);
 						cssOptions.maxWidth = $container.outerWidth(true);
-					} else if (options.position === 'left') {
+					} else if (options.position === 'right') {
 						cssOptions.top = $container.offset().top;
-						cssOptions.left = $container.offset().left - 45;
+						cssOptions.left = $container.offset().left + $container.outerWidth(true) + 25;
 						cssOptions.height = $container.outerHeight(true);
 						cssOptions.minHeight = $container.outerHeight(true);
 						cssOptions.maxHeight = $container.outerHeight(true);
-					} else { // default - it is either 'right' or it is something we don't know so we use the default value of 'right'
+					} else { // default - it is either 'left' or it is something we don't know so we use the default of 'left'
 						cssOptions.top = $container.offset().top;
-						cssOptions.left = $container.offset().left + $container.outerWidth(true);
+						cssOptions.left = $container.offset().left - 45;
 						cssOptions.height = $container.outerHeight(true);
 						cssOptions.minHeight = $container.outerHeight(true);
 						cssOptions.maxHeight = $container.outerHeight(true);
