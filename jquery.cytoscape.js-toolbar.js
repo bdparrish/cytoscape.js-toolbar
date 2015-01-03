@@ -257,6 +257,8 @@ function pan(core, direction, factors) {
 
 		            options.tools = finalToolsList;
 		        }
+		    } else {
+	            options.tools = defaults.tools;
 		    }
 
 			var fn = params;
