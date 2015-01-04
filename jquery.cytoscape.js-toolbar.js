@@ -257,8 +257,6 @@ function pan(core, direction, factors) {
 
 		            options.tools = finalToolsList;
 		        }
-		    } else {
-	            options.tools = defaults.tools;
 		    }
 
 			var fn = params;
@@ -284,16 +282,16 @@ function pan(core, direction, factors) {
 				},
 
 				canPerform: function (e, fn) {
-					if (!e.data.data.selectedTool) {
+					if (!this.data.selectedTool) {
 						return false;
 					}
 
-					var toolIndexes = e.data.data.selectedTool;
-					var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
-					var handlerIndex = e.data.handlerIndex;
+					var toolIndexes = this.data.selectedTool;
+					var tool = this.data.options.tools[toolIndexes[0]][toolIndexes[1]];
+					var handlerIndex = this.handlerIndex;
 
 					if (!(toolIndexes === undefined) && $.inArray(fn, tool.action) > -1) {
-						var selector = e.data.data.handlers[handlerIndex].selector;
+						var selector = this.data.handlers[handlerIndex].selector;
 
 						switch (selector) {
 							case 'node':
@@ -309,6 +307,12 @@ function pan(core, direction, factors) {
 					}
 
 					return false;
+				},
+
+				getToolOptions: function(selectedTool) {
+					var tool = this.data.options.tools[selectedTool[0]][selectedTool[1]];
+
+					return tool.options;
 				},
 
 				init: function () {
@@ -522,7 +526,8 @@ function pan(core, direction, factors) {
 							var eventData = {
 								data: data,
 								handlerIndex: index - 1,
-								canPerform: functions.canPerform
+								canPerform: functions.canPerform,
+								getToolOptions: functions.getToolOptions
 							};
 
 							if (selector === 'cy') {

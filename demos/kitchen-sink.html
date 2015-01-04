@@ -123,6 +123,7 @@
                     <li><a href="#simple">Simple</a></li>
                     <li><a href="#grouped">Grouped</a></li>
                     <li><a href="#positioning">Positioning</a></li>
+                    <li><a href="#options">Tool Options</a></li>
                 </ul>
             </div>
             <div id="tutorials" class="col-md-10">
@@ -319,6 +320,92 @@
     // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'bottom' });
     // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'left' }); // default
                     </code></pre>
+                    <!-- options -->
+                    <h2 id="options">Tool Options</h2>
+                    <p>Setting a tool's options gives you the ability to pass custom data or functions to the responding action.</p>
+                    <div id="cy-options" class="row cy"></div>
+                    <h4>Code</h4>
+                    <h6>HTML</h6>
+                    <pre><code class="html">
+    &lt;div id="cy-options" class="row cy"&gt;&lt;/div&gt;
+                    </code></pre>
+                    <h6>Javascript</h6>
+                    <pre><code class="javascript">
+    var cyOptions = window.cyOptions = cytoscape({
+        container: document.getElementById('cy-options'),
+
+        // removed for brevity
+    });
+
+    cyOptions.toolbar({
+        toolbarClass: "cy-options-toolbar",
+        tools: [
+            [
+                {
+                    icon: 'fa fa-link',
+                    event: ['tap'],
+                    selector: 'node',
+                    // add you options to this property, check out our custom function to use.
+                    options: {
+                        helloWorld: function(isTrue) {
+                            if (isTrue) {
+                                return 'Hello World!';
+                            }
+
+                            return 'Goodbye!';
+                        }
+                    },
+                    bubbleToCore: false,
+                    tooltip: 'Link',
+                    action: [performLink]
+                }
+            ]
+        ],
+        appendTools: true
+    });
+
+    // linking edge tool
+    var src;
+    function performLink(e) {
+        if (!e.data.canPerform(e, performLink)) {
+            return;
+        }
+
+        if (src) {
+            tgt = e.cyTarget;
+
+            e.cy.add({
+                group: "edges",
+                data: {
+                    source: src.id(),
+                    target: tgt.id()
+                }
+            });
+
+            src.removeClass('selected-node');
+            src = undefined;
+
+            // get the selected tool passed in
+            var selectedTool = e.data.data.selectedTool;
+            // get the selected tool's options property
+            var options = e.data.getToolOptions(selectedTool);
+
+            // use our custom function!
+            alert(options.helloWorld(false));
+        } else {
+            src = e.cyTarget;
+            src.addClass('selected-node');
+
+            // get the selected tool passed in
+            var selectedTool = e.data.data.selectedTool;
+            // get the selected tool's options property
+            var options = e.data.getToolOptions(selectedTool);
+
+            // use our custom function!
+            alert(options.helloWorld(true));
+        }
+    }
+                    </code></pre>
                 </div>
                 <!-- Instructions -->
                 <div id="tutorial-instructions" class="col-md-4">
@@ -362,6 +449,57 @@
 <script type="text/javascript" src="helpers/html.js"></script>
 <script src="../jquery.cytoscape.js-toolbar.js"></script>
 
+<!-- defaults -->
+<script>
+    var stylesheet = [
+        {
+            selector: 'node',
+            css: {
+                'content': 'data(id)',
+                'text-halign': 'center',
+                'text-valign': 'center',
+                'background-opacity': '0'
+            }
+        },
+
+        {
+            selector: 'edge',
+            css: {
+                'target-arrow-shape': 'triangle'
+            }
+        },
+
+        // custom classes
+        {
+            selector: '.selected-node',
+            css: {
+                'border-color': '#f00',
+                'border-width': '2px'
+            }
+        }
+    ];
+
+    var elements = {
+        nodes: [
+            { data: { id: 'a' } },
+            { data: { id: 'b' } },
+            { data: { id: 'c' } },
+            { data: { id: 'd' } },
+            { data: { id: 'e' } }
+        ], 
+
+        edges: [
+            { data: { id: 'ae', weight: 1, source: 'a', target: 'e' } },
+            { data: { id: 'ab', weight: 3, source: 'a', target: 'b' } },
+            { data: { id: 'be', weight: 4, source: 'b', target: 'e' } },
+            { data: { id: 'bc', weight: 5, source: 'b', target: 'c' } },
+            { data: { id: 'ce', weight: 6, source: 'c', target: 'e' } },
+            { data: { id: 'cd', weight: 2, source: 'c', target: 'd' } },
+            { data: { id: 'de', weight: 7, source: 'd', target: 'e' } }
+        ]
+    };
+</script>
+
 <!-- cy-default script -->
 <script>
     $(function () {
@@ -372,52 +510,9 @@
                 window.cyDefault = this;
             },
 
-            style: [
-                {
-                    selector: 'node',
-                    css: {
-                        'content': 'data(id)',
-                        'text-halign': 'center',
-                        'text-valign': 'center',
-                        'background-opacity': '0'
-                    }
-                },
+            style: stylesheet,
 
-                {
-                    selector: 'edge',
-                    css: {
-                        'target-arrow-shape': 'triangle'
-                    }
-                },
-
-                {
-                    selector: '.selected-node',
-                    css: {
-                        'border-color': '#f00',
-                        'border-width': '2px'
-                    }
-                }
-            ],
-
-            elements: {
-                nodes: [
-                    { data: { id: 'a' } },
-                    { data: { id: 'b' } },
-                    { data: { id: 'c' } },
-                    { data: { id: 'd' } },
-                    { data: { id: 'e' } }
-                ], 
-
-                edges: [
-                    { data: { id: 'ae', weight: 1, source: 'a', target: 'e' } },
-                    { data: { id: 'ab', weight: 3, source: 'a', target: 'b' } },
-                    { data: { id: 'be', weight: 4, source: 'b', target: 'e' } },
-                    { data: { id: 'bc', weight: 5, source: 'b', target: 'c' } },
-                    { data: { id: 'ce', weight: 6, source: 'c', target: 'e' } },
-                    { data: { id: 'cd', weight: 2, source: 'c', target: 'd' } },
-                    { data: { id: 'de', weight: 7, source: 'd', target: 'e' } }
-                ]
-            },
+            elements: elements,
   
             layout: {
                 name: 'circle',
@@ -439,53 +534,9 @@
                 window.cySimple = this;
             },
 
-            style: [
-                {
-                    selector: 'node',
-                    css: {
-                        'content': 'data(id)',
-                        'text-halign': 'center',
-                        'text-valign': 'center',
-                        'background-opacity': '0'
-                    }
-                },
+            style: stylesheet,
 
-                {
-                    selector: 'edge',
-                    css: {
-                        'target-arrow-shape': 'triangle'
-                    }
-                },
-
-                // custom classes
-                {
-                    selector: '.selected-node',
-                    css: {
-                        'border-color': '#f00',
-                        'border-width': '2px'
-                    }
-                }
-            ],
-
-            elements: {
-                nodes: [
-                    { data: { id: 'a' } },
-                    { data: { id: 'b' } },
-                    { data: { id: 'c' } },
-                    { data: { id: 'd' } },
-                    { data: { id: 'e' } }
-                ], 
-
-                edges: [
-                    { data: { id: 'ae', weight: 1, source: 'a', target: 'e' } },
-                    { data: { id: 'ab', weight: 3, source: 'a', target: 'b' } },
-                    { data: { id: 'be', weight: 4, source: 'b', target: 'e' } },
-                    { data: { id: 'bc', weight: 5, source: 'b', target: 'c' } },
-                    { data: { id: 'ce', weight: 6, source: 'c', target: 'e' } },
-                    { data: { id: 'cd', weight: 2, source: 'c', target: 'd' } },
-                    { data: { id: 'de', weight: 7, source: 'd', target: 'e' } }
-                ]
-            },
+            elements: elements,
   
             layout: {
                 name: 'circle',
@@ -535,10 +586,6 @@
                 src.addClass('selected-node');
             }
         }
-
-        function getLinkName(src, tgt) {
-            return src.id() + "->" + tgt.id();
-        }
     });
 </script>
 
@@ -552,52 +599,9 @@
                 window.cyGrouped = this;
             },
 
-            style: [
-                {
-                    selector: 'node',
-                    css: {
-                        'content': 'data(id)',
-                        'text-halign': 'center',
-                        'text-valign': 'center',
-                        'background-opacity': '0'
-                    }
-                },
+            style: stylesheet,
 
-                {
-                    selector: 'edge',
-                    css: {
-                        'target-arrow-shape': 'triangle'
-                    }
-                },
-
-                {
-                    selector: '.selected-node',
-                    css: {
-                        'border-color': '#f00',
-                        'border-width': '2px'
-                    }
-                }
-            ],
-
-            elements: {
-                nodes: [
-                    { data: { id: 'a' } },
-                    { data: { id: 'b' } },
-                    { data: { id: 'c' } },
-                    { data: { id: 'd' } },
-                    { data: { id: 'e' } }
-                ], 
-
-                edges: [
-                    { data: { id: 'ae', weight: 1, source: 'a', target: 'e' } },
-                    { data: { id: 'ab', weight: 3, source: 'a', target: 'b' } },
-                    { data: { id: 'be', weight: 4, source: 'b', target: 'e' } },
-                    { data: { id: 'bc', weight: 5, source: 'b', target: 'c' } },
-                    { data: { id: 'ce', weight: 6, source: 'c', target: 'e' } },
-                    { data: { id: 'cd', weight: 2, source: 'c', target: 'd' } },
-                    { data: { id: 'de', weight: 7, source: 'd', target: 'e' } }
-                ]
-            },
+            elements: elements,
   
             layout: {
                 name: 'circle',
@@ -712,52 +716,9 @@
                 window.cyPosition = this;
             },
 
-            style: [
-                {
-                    selector: 'node',
-                    css: {
-                        'content': 'data(id)',
-                        'text-halign': 'center',
-                        'text-valign': 'center',
-                        'background-opacity': '0'
-                    }
-                },
+            style: stylesheet,
 
-                {
-                    selector: 'edge',
-                    css: {
-                        'target-arrow-shape': 'triangle'
-                    }
-                },
-
-                {
-                    selector: '.selected-node',
-                    css: {
-                        'border-color': '#f00',
-                        'border-width': '2px'
-                    }
-                }
-            ],
-
-            elements: {
-                nodes: [
-                    { data: { id: 'a' } },
-                    { data: { id: 'b' } },
-                    { data: { id: 'c' } },
-                    { data: { id: 'd' } },
-                    { data: { id: 'e' } }
-                ], 
-
-                edges: [
-                    { data: { id: 'ae', weight: 1, source: 'a', target: 'e' } },
-                    { data: { id: 'ab', weight: 3, source: 'a', target: 'b' } },
-                    { data: { id: 'be', weight: 4, source: 'b', target: 'e' } },
-                    { data: { id: 'bc', weight: 5, source: 'b', target: 'c' } },
-                    { data: { id: 'ce', weight: 6, source: 'c', target: 'e' } },
-                    { data: { id: 'cd', weight: 2, source: 'c', target: 'd' } },
-                    { data: { id: 'de', weight: 7, source: 'd', target: 'e' } }
-                ]
-            },
+            elements: elements,
   
             layout: {
                 name: 'circle',
@@ -769,6 +730,90 @@
             toolbarClass: "cy-position-toolbar",
             position: 'right'
         });
+    });
+</script>
+
+<!-- cy simple script -->
+<script>
+    $(function () {
+        var cyOptions = window.cyOptions = cytoscape({
+            container: document.getElementById('cy-options'),
+
+            ready: function () {
+                window.cyOptions = this;
+            },
+
+            style: stylesheet,
+
+            elements: elements,
+  
+            layout: {
+                name: 'circle',
+                padding: 10
+            }
+        });
+
+        cyOptions.toolbar({
+            toolbarClass: "cy-options-toolbar",
+            tools: [
+                [
+                    {
+                        icon: 'fa fa-link',
+                        event: ['tap'],
+                        selector: 'node',
+                        options: {
+                            helloWorld: function(isTrue) {
+                                if (isTrue) {
+                                    return 'Hello World!';
+                                }
+
+                                return 'Goodbye!';
+                            }
+                        },
+                        bubbleToCore: false,
+                        tooltip: 'Link',
+                        action: [performLink]
+                    }
+                ]
+            ],
+            appendTools: true
+        });
+
+        // linking edge tool
+        var src;
+        function performLink(e) {
+            if (!e.data.canPerform(e, performLink)) {
+                return;
+            }
+
+            if (src) {
+                tgt = e.cyTarget;
+
+                e.cy.add({
+                    group: "edges",
+                    data: {
+                        source: src.id(),
+                        target: tgt.id()
+                    }
+                });
+
+                src.removeClass('selected-node');
+                src = undefined;
+
+                var selectedTool = e.data.data.selectedTool;
+                var options = e.data.getToolOptions(selectedTool);
+
+                alert(options.helloWorld(false));
+            } else {
+                src = e.cyTarget;
+                src.addClass('selected-node');
+
+                var selectedTool = e.data.data.selectedTool;
+                var options = e.data.getToolOptions(selectedTool);
+
+                alert(options.helloWorld(true));
+            }
+        }
     });
 </script>
 
