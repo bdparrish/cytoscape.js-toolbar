@@ -236,7 +236,7 @@ function pan(core, direction, factors) {
 		    console.log(options);
 
 		    if (params) {
-		    	if (params.tools === undefined) { params.tools = []; }
+		    	if (params.tools === undefined) { params.tools = defaults.tools; }
 
 		        options.tools = params.tools;
 		    }
