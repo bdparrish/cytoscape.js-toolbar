@@ -142,10 +142,12 @@
     var cyDefault = window.cyDefault = cytoscape({
         container: document.getElementById('cy-default'),
 
+        ready: function () {
+            cyDefault.toolbar();
+        },
+
         // removed for brevity
     });
-
-    cyDefault.toolbar();
                     </code></pre>
                     <!-- simple -->
                     <h2 id="simple">Simple</h2>
@@ -161,24 +163,26 @@
     var cySimple = window.cySimple = cytoscape({
         container: document.getElementById('cy-simple'),
 
-        // removed for brevity
-    });
+        ready: function () {
+            cySimple.toolbar({
+                toolbarClass: "cy-simple-toolbar",
+                tools: [
+                    [
+                        {
+                            icon: 'fa fa-link',
+                            event: ['tap'],
+                            selector: 'node',
+                            bubbleToCore: false,
+                            tooltip: 'Link',
+                            action: [performLink]
+                        }
+                    ]
+                ],
+                appendTools: true
+            });
+        },
 
-    cySimple.toolbar({
-        toolbarClass: "cy-simple-toolbar",
-        tools: [
-            [
-                {
-                    icon: 'fa fa-link',
-                    event: ['tap'],
-                    selector: 'node',
-                    bubbleToCore: false,
-                    tooltip: 'Link',
-                    action: [performLink]
-                }
-            ]
-        ],
-        appendTools: true
+        // removed for brevity
     });
                     </code></pre>
                     <!-- grouped -->
@@ -195,102 +199,104 @@
     var cyGrouped = window.cyGrouped = cytoscape({
         container: document.getElementById('cy-grouped'),
 
-        // removed for brevity
-    });
+        ready: function () {
+            cyGrouped.toolbar({
+                toolbarClass: "cy-grouped-toolbar",
+                tools: [
+                    [
+                        {
+                            icon: 'fa fa-search-plus',
+                            event: ['tap'],
+                            selector: 'cy',
+                            options: {
+                                cy: {
+                                    zoom: 0.1,
+                                    minZoom: 0.1,
+                                    maxZoom: 10,
+                                    zoomDelay: 45
+                                }
+                            },
+                            bubbleToCore: false,
+                            tooltip: 'Zoom In',
+                            action: [performZoomIn]
+                        },
+                        {
+                            icon: 'fa fa-search-minus',
+                            event: ['tap'],
+                            selector: 'cy',
+                            options: {
+                                cy: {
+                                    zoom: -0.1,
+                                    minZoom: 0.1,
+                                    maxZoom: 10,
+                                    zoomDelay: 45
+                                }
+                            },
+                            bubbleToCore: false,
+                            tooltip: 'Zoom Out',
+                            action: [performZoomOut]
+                        }
+                    ],
+                    [
+                        {
+                            icon: 'fa fa-arrow-right',
+                            event: ['tap'],
+                            selector: 'cy',
+                            options: {
+                                cy: {
+                                    distance: -80,
+                                }
+                            },
+                            bubbleToCore: true,
+                            tooltip: 'Pan Right',
+                            action: [performPanRight]
+                        },
+                        {
+                            icon: 'fa fa-arrow-down',
+                            event: ['tap'],
+                            selector: 'cy',
+                            options: {
+                                cy: {
+                                    distance: -80,
+                                }
+                            },
+                            bubbleToCore: true,
+                            tooltip: 'Pan Down',
+                            action: [performPanDown]
+                        },
+                        {
+                            icon: 'fa fa-arrow-left',
+                            event: ['tap'],
+                            selector: 'cy',
+                            options: {
+                                cy: {
+                                    distance: 80,
+                                }
+                            },
+                            bubbleToCore: true,
+                            tooltip: 'Pan Left',
+                            action: [performPanLeft]
+                        },
+                        {
+                            icon: 'fa fa-arrow-up',
+                            event: ['tap'],
+                            selector: 'cy',
+                            options: {
+                                cy: {
+                                    distance: 80,
+                                }
+                            },
+                            bubbleToCore: true,
+                            tooltip: 'Pan Up',
+                            action: [performPanUp]
+                        }
+                    ]
+                ],
+                appendTools: false
+            });
+        },
 
-    cyGrouped.toolbar({
-        toolbarClass: "cy-grouped-toolbar",
-        tools: [
-            [
-                {
-                    icon: 'fa fa-search-plus',
-                    event: ['tap'],
-                    selector: 'cy',
-                    options: {
-                        cy: {
-                            zoom: 0.1,
-                            minZoom: 0.1,
-                            maxZoom: 10,
-                            zoomDelay: 45
-                        }
-                    },
-                    bubbleToCore: false,
-                    tooltip: 'Zoom In',
-                    action: [performZoomIn]
-                },
-                {
-                    icon: 'fa fa-search-minus',
-                    event: ['tap'],
-                    selector: 'cy',
-                    options: {
-                        cy: {
-                            zoom: -0.1,
-                            minZoom: 0.1,
-                            maxZoom: 10,
-                            zoomDelay: 45
-                        }
-                    },
-                    bubbleToCore: false,
-                    tooltip: 'Zoom Out',
-                    action: [performZoomOut]
-                }
-            ],
-            [
-                {
-                    icon: 'fa fa-arrow-right',
-                    event: ['tap'],
-                    selector: 'cy',
-                    options: {
-                        cy: {
-                            distance: -80,
-                        }
-                    },
-                    bubbleToCore: true,
-                    tooltip: 'Pan Right',
-                    action: [performPanRight]
-                },
-                {
-                    icon: 'fa fa-arrow-down',
-                    event: ['tap'],
-                    selector: 'cy',
-                    options: {
-                        cy: {
-                            distance: -80,
-                        }
-                    },
-                    bubbleToCore: true,
-                    tooltip: 'Pan Down',
-                    action: [performPanDown]
-                },
-                {
-                    icon: 'fa fa-arrow-left',
-                    event: ['tap'],
-                    selector: 'cy',
-                    options: {
-                        cy: {
-                            distance: 80,
-                        }
-                    },
-                    bubbleToCore: true,
-                    tooltip: 'Pan Left',
-                    action: [performPanLeft]
-                },
-                {
-                    icon: 'fa fa-arrow-up',
-                    event: ['tap'],
-                    selector: 'cy',
-                    options: {
-                        cy: {
-                            distance: 80,
-                        }
-                    },
-                    bubbleToCore: true,
-                    tooltip: 'Pan Up',
-                    action: [performPanUp]
-                }
-            ]
-        ],
-        appendTools: false
+        // removed for brevity
     });
                     </code></pre>
                     <!-- positioning -->
@@ -307,18 +313,20 @@
     var cyPosition = window.cyPosition = cytoscape({
         container: document.getElementById('cy-position'),
 
+        ready: function () {
+            cyPosition.toolbar({
+                toolbarClass: "cy-position-toolbar",
+                position: 'right'
+            });
+
+            // different options
+            // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'top' });
+            // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'bottom' });
+            // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'left' }); // default
+        },
+
         // removed for brevity
     });
-
-    cyPosition.toolbar({
-        toolbarClass: "cy-position-toolbar",
-        position: 'right'
-    });
-
-    // different options
-    // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'top' });
-    // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'bottom' });
-    // cyPosition.toolbar({ toolbarClass: "cy-position-toolbar", position: 'left' }); // default
                     </code></pre>
                     <!-- options -->
                     <h2 id="options">Tool Options</h2>
@@ -334,34 +342,36 @@
     var cyOptions = window.cyOptions = cytoscape({
         container: document.getElementById('cy-options'),
 
-        // removed for brevity
-    });
+        ready: function () {
+            cyOptions.toolbar({
+                toolbarClass: "cy-options-toolbar",
+                tools: [
+                    [
+                        {
+                            icon: 'fa fa-link',
+                            event: ['tap'],
+                            selector: 'node',
+                            // add you options to this property, check out our custom function to use.
+                            options: {
+                                helloWorld: function(isTrue) {
+                                    if (isTrue) {
+                                        return 'Hello World!';
+                                    }
 
-    cyOptions.toolbar({
-        toolbarClass: "cy-options-toolbar",
-        tools: [
-            [
-                {
-                    icon: 'fa fa-link',
-                    event: ['tap'],
-                    selector: 'node',
-                    // add you options to this property, check out our custom function to use.
-                    options: {
-                        helloWorld: function(isTrue) {
-                            if (isTrue) {
-                                return 'Hello World!';
-                            }
-
-                            return 'Goodbye!';
+                                    return 'Goodbye!';
+                                }
+                            },
+                            bubbleToCore: false,
+                            tooltip: 'Link',
+                            action: [performLink]
                         }
-                    },
-                    bubbleToCore: false,
-                    tooltip: 'Link',
-                    action: [performLink]
-                }
-            ]
-        ],
-        appendTools: true
+                    ]
+                ],
+                appendTools: true
+            });
+        },
+
+        // removed for brevity
     });
 
     // linking edge tool
@@ -507,7 +517,7 @@
             container: document.getElementById('cy-default'),
 
             ready: function () {
-                window.cyDefault = this;
+                cyDefault.toolbar();
             },
 
             style: stylesheet,
@@ -519,8 +529,6 @@
                 padding: 10
             }
         });
-
-        cyDefault.toolbar();
     });
 </script>
 
@@ -531,7 +539,22 @@
             container: document.getElementById('cy-simple'),
 
             ready: function () {
-                window.cySimple = this;
+                cySimple.toolbar({
+                    toolbarClass: "cy-simple-toolbar",
+                    tools: [
+                        [
+                            {
+                                icon: 'fa fa-link',
+                                event: ['tap'],
+                                selector: 'node',
+                                bubbleToCore: false,
+                                tooltip: 'Link',
+                                action: [performLink]
+                            }
+                        ]
+                    ],
+                    appendTools: true
+                });
             },
 
             style: stylesheet,
@@ -542,23 +565,6 @@
                 name: 'circle',
                 padding: 10
             }
-        });
-
-        cySimple.toolbar({
-            toolbarClass: "cy-simple-toolbar",
-            tools: [
-                [
-                    {
-                        icon: 'fa fa-link',
-                        event: ['tap'],
-                        selector: 'node',
-                        bubbleToCore: false,
-                        tooltip: 'Link',
-                        action: [performLink]
-                    }
-                ]
-            ],
-            appendTools: true
         });
 
         // linking edge tool
@@ -596,7 +602,100 @@
             container: document.getElementById('cy-grouped'),
 
             ready: function () {
-                window.cyGrouped = this;
+                cyGrouped.toolbar({
+                    toolbarClass: "cy-grouped-toolbar",
+                    tools: [
+                        [
+                            {
+                                icon: 'fa fa-search-plus',
+                                event: ['tap'],
+                                selector: 'cy',
+                                options: {
+                                    cy: {
+                                        zoom: 0.1,
+                                        minZoom: 0.1,
+                                        maxZoom: 10,
+                                        zoomDelay: 45
+                                    }
+                                },
+                                bubbleToCore: false,
+                                tooltip: 'Zoom In',
+                                action: [performZoomIn]
+                            },
+                            {
+                                icon: 'fa fa-search-minus',
+                                event: ['tap'],
+                                selector: 'cy',
+                                options: {
+                                    cy: {
+                                        zoom: -0.1,
+                                        minZoom: 0.1,
+                                        maxZoom: 10,
+                                        zoomDelay: 45
+                                    }
+                                },
+                                bubbleToCore: false,
+                                tooltip: 'Zoom Out',
+                                action: [performZoomOut]
+                            }
+                        ],
+                        [
+                            {
+                                icon: 'fa fa-arrow-right',
+                                event: ['tap'],
+                                selector: 'cy',
+                                options: {
+                                    cy: {
+                                        distance: -80,
+                                    }
+                                },
+                                bubbleToCore: true,
+                                tooltip: 'Pan Right',
+                                action: [performPanRight]
+                            },
+                            {
+                                icon: 'fa fa-arrow-down',
+                                event: ['tap'],
+                                selector: 'cy',
+                                options: {
+                                    cy: {
+                                        distance: -80,
+                                    }
+                                },
+                                bubbleToCore: true,
+                                tooltip: 'Pan Down',
+                                action: [performPanDown]
+                            },
+                            {
+                                icon: 'fa fa-arrow-left',
+                                event: ['tap'],
+                                selector: 'cy',
+                                options: {
+                                    cy: {
+                                        distance: 80,
+                                    }
+                                },
+                                bubbleToCore: true,
+                                tooltip: 'Pan Left',
+                                action: [performPanLeft]
+                            },
+                            {
+                                icon: 'fa fa-arrow-up',
+                                event: ['tap'],
+                                selector: 'cy',
+                                options: {
+                                    cy: {
+                                        distance: 80,
+                                    }
+                                },
+                                bubbleToCore: true,
+                                tooltip: 'Pan Up',
+                                action: [performPanUp]
+                            }
+                        ]
+                    ],
+                    appendTools: false
+                });
             },
 
             style: stylesheet,
@@ -607,101 +706,6 @@
                 name: 'circle',
                 padding: 10
             }
-        });
-
-        cyGrouped.toolbar({
-            toolbarClass: "cy-grouped-toolbar",
-            tools: [
-                [
-                    {
-                        icon: 'fa fa-search-plus',
-                        event: ['tap'],
-                        selector: 'cy',
-                        options: {
-                            cy: {
-                                zoom: 0.1,
-                                minZoom: 0.1,
-                                maxZoom: 10,
-                                zoomDelay: 45
-                            }
-                        },
-                        bubbleToCore: false,
-                        tooltip: 'Zoom In',
-                        action: [performZoomIn]
-                    },
-                    {
-                        icon: 'fa fa-search-minus',
-                        event: ['tap'],
-                        selector: 'cy',
-                        options: {
-                            cy: {
-                                zoom: -0.1,
-                                minZoom: 0.1,
-                                maxZoom: 10,
-                                zoomDelay: 45
-                            }
-                        },
-                        bubbleToCore: false,
-                        tooltip: 'Zoom Out',
-                        action: [performZoomOut]
-                    }
-                ],
-                [
-                    {
-                        icon: 'fa fa-arrow-right',
-                        event: ['tap'],
-                        selector: 'cy',
-                        options: {
-                            cy: {
-                                distance: -80,
-                            }
-                        },
-                        bubbleToCore: true,
-                        tooltip: 'Pan Right',
-                        action: [performPanRight]
-                    },
-                    {
-                        icon: 'fa fa-arrow-down',
-                        event: ['tap'],
-                        selector: 'cy',
-                        options: {
-                            cy: {
-                                distance: -80,
-                            }
-                        },
-                        bubbleToCore: true,
-                        tooltip: 'Pan Down',
-                        action: [performPanDown]
-                    },
-                    {
-                        icon: 'fa fa-arrow-left',
-                        event: ['tap'],
-                        selector: 'cy',
-                        options: {
-                            cy: {
-                                distance: 80,
-                            }
-                        },
-                        bubbleToCore: true,
-                        tooltip: 'Pan Left',
-                        action: [performPanLeft]
-                    },
-                    {
-                        icon: 'fa fa-arrow-up',
-                        event: ['tap'],
-                        selector: 'cy',
-                        options: {
-                            cy: {
-                                distance: 80,
-                            }
-                        },
-                        bubbleToCore: true,
-                        tooltip: 'Pan Up',
-                        action: [performPanUp]
-                    }
-                ]
-            ],
-            appendTools: false
         });
     });
 </script>
@@ -713,7 +717,10 @@
             container: document.getElementById('cy-position'),
 
             ready: function () {
-                window.cyPosition = this;
+                cyPosition.toolbar({
+                    toolbarClass: "cy-position-toolbar",
+                    position: 'right'
+                });
             },
 
             style: stylesheet,
@@ -724,11 +731,6 @@
                 name: 'circle',
                 padding: 10
             }
-        });
-
-        cyPosition.toolbar({
-            toolbarClass: "cy-position-toolbar",
-            position: 'right'
         });
     });
 </script>
@@ -740,7 +742,31 @@
             container: document.getElementById('cy-options'),
 
             ready: function () {
-                window.cyOptions = this;
+                cyOptions.toolbar({
+                    toolbarClass: "cy-options-toolbar",
+                    tools: [
+                        [
+                            {
+                                icon: 'fa fa-link',
+                                event: ['tap'],
+                                selector: 'node',
+                                options: {
+                                    helloWorld: function(isTrue) {
+                                        if (isTrue) {
+                                            return 'Hello World!';
+                                        }
+
+                                        return 'Goodbye!';
+                                    }
+                                },
+                                bubbleToCore: false,
+                                tooltip: 'Link',
+                                action: [performLink]
+                            }
+                        ]
+                    ],
+                    appendTools: true
+                });
             },
 
             style: stylesheet,
@@ -751,32 +777,6 @@
                 name: 'circle',
                 padding: 10
             }
-        });
-
-        cyOptions.toolbar({
-            toolbarClass: "cy-options-toolbar",
-            tools: [
-                [
-                    {
-                        icon: 'fa fa-link',
-                        event: ['tap'],
-                        selector: 'node',
-                        options: {
-                            helloWorld: function(isTrue) {
-                                if (isTrue) {
-                                    return 'Hello World!';
-                                }
-
-                                return 'Goodbye!';
-                            }
-                        },
-                        bubbleToCore: false,
-                        tooltip: 'Link',
-                        action: [performLink]
-                    }
-                ]
-            ],
-            appendTools: true
         });
 
         // linking edge tool
