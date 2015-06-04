@@ -298,7 +298,7 @@ function pan(core, direction, factors) {
 								return e.cyTarget.isNode();
 							case 'edge':
 							    return e.cyTarget.isEdge();
-						    case 'node,edget':
+						    case 'node,edge':
 						    case 'edge,node':
 						        return e.cyTarget.isNode() || e.cyTarget.isEdge();
 							case 'cy':
