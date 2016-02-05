@@ -379,7 +379,7 @@ function pan(core, direction, factors) {
 										.css(cssOptions)
 					data.$container = $toolbar;
 
-					$toolbar.appendTo(defaults.toolbarContainer);
+					$toolbar.appendTo(options.toolbarContainer);
 
 					$.each(options.tools, function (toolListIndex, toolList) {
 						var $toolListWrapper = $('<div class="' + options.multipleToolsClass + '-wrapper"></div>')
