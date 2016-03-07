@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Tabs</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <style>
+      #back {
+        position: relative;
+      }
+
+      #cy {
+        height: 500px;
+        margin: 15px 0 0 50px;
+        border: 1px dashed #444;
+      }
+
+      .ui-cytoscape-toolbar {
+        left: 0 !important;
+        top: 0 !important;
+      }
+    </style>
+</head>
+<body data-spy="scroll" data-target="#tutorial-menu">
+  <div class="container">
+    <h1>Cytoscape toobar into tabs and custom text</h1>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#front" aria-controls="front" role="tab" data-toggle="tab">Front</a>
+      </li>
+      <li role="presentation">
+        <a href="#back" aria-controls="back" role="tab" data-toggle="tab">Back</a>
+      </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="front">
+        <h2>Empty, try the tab 1</h2>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="back">
+        <div id="cy"></div>
+        <div id="cytoolbar"></div>
+      </div>
+    </div>
+
+  </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script src="https://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+<script src="https://rawgit.com/dtelaroli/cytoscape.js-toolbar/master/cytoscape-toolbar.js"></script>
+
+<!-- cy outlook script -->
+<script>
+var color = '#444', cy;
+function build() {
+  cy = cytoscape({
+    container: document.getElementById('cy'),
+    wheelSensitivity: 0.1,
+    style: [{
+        selector: 'node',
+        css: {
+          'shape': 'circle',
+          'content': 'data(label)',
+          'text-valign': 'center',
+          'text-outline-width': 2,
+          'text-outline-color': color,
+          'background-color': '#777',
+          'border-color': color,
+          'border-width': 2,
+          'color': '#fff',
+          'font-size': '14px'
+        }
+      },
+
+      {
+        selector: 'edge',
+        css: {
+          'target-arrow-shape': 'triangle',
+          'source-arrow-shape': 'circle',
+          'font-style': 'italic',
+          'target-arrow-color': color,
+          'source-arrow-color': color,
+          'target-arrow-width': '10px',
+          'line-color': color,
+          'edge-text-rotation': 'autorotate'
+        }
+      },
+
+      {
+        selector: '.selected-node',
+        css: {
+          'border-color': '#f00',
+          'border-width': 2
+        }
+      }
+    ]
+  });
+
+  cy.toolbar({
+    cyContainer: 'cy',
+    toolbarContainer: '#cytoolbar',
+    position: 'right',
+    style: 'position: relative',
+    tools: [
+      [{
+        icon: 'glyphicon glyphicon-plus',
+        event: ['tap'],
+        selector: 'cy',
+        options: {
+          clazz: 'node-default'
+        },
+        bubbleToCore: false,
+        tooltip: 'Causa inicial',
+        action: [addCauseDefaultToGraph]
+      }],
+      [{
+        icon: 'fa fa-link',
+        event: ['tap'],
+        selector: 'node',
+        bubbleToCore: false,
+        tooltip: 'Link - Contribui para',
+        action: [performLink]
+      }],
+      [{
+        icon: 'fa fa-trash-o',
+        event: ['tap'],
+        selector: 'edge,node',
+        bubbleToCore: false,
+        tooltip: 'Remove Node/Edge',
+        action: [performRemove]
+      }]
+
+    ],
+    appendTools: false
+  }); 
+
+  function addCauseDefaultToGraph(e) {
+    addObject(e, addCauseDefaultToGraph);
+  }
+  function addCauseGreenToGraph(e) {
+    addObject(e, addCauseGreenToGraph);
+  }
+  function addCauseYellowToGraph(e) {
+    addObject(e, addCauseYellowToGraph);
+  }
+  function addCauseRedToGraph(e) {
+    addObject(e, addCauseRedToGraph);
+  }
+
+  function addObject(e, action) {
+    if (!e.data.canPerform(e, action)) {
+      return;
+    }
+    var text = prompt('Type the text');
+    if(text === null || text === '') {
+      return;
+    }
+
+    var toolIndexes = e.data.data.selectedTool;
+    var tool = e.data.data.options.tools[toolIndexes[0]][toolIndexes[1]];
+
+    var object = {
+      group: 'nodes',
+      data: {
+        label: text
+      },
+      position: {
+        x: e.cyPosition.x,
+        y: e.cyPosition.y
+      }
+    }
+
+    e.cy.add(object).addClass('tool-node').addClass(tool.options.clazz);
+  }
+
+  var src;
+  function performLink(e) {
+    if (!e.data.canPerform(e, performLink)) {
+      return;
+    }
+
+    if (src) {
+      tgt = e.cyTarget;
+
+      e.cy.add({
+        group: 'edges',
+        data: {
+          source: src.id(),
+          target: tgt.id(),
+          strength: 65
+        }
+      });
+
+      src.removeClass('selected-node');
+      src = undefined;
+    } else {
+      src = e.cyTarget;
+      src.addClass('selected-node');
+    }
+  }
+
+  function performRemove(e) {
+    if (!e.data.canPerform(e, performRemove)) {
+      return;
+    }
+
+    cy.remove(e.cyTarget);
+  }     
+}
+
+$(document).ready(function() {
+  $('a[href=#back]').on('shown.bs.tab', build);
+});
+</script>
+
+</html>
