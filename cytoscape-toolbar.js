@@ -110,6 +110,7 @@ function pan(core, direction, factors) {
 (function ($) {
 	var defaults = {
 		cyContainer: 'cy', // id being used for cytoscape core instance
+		toolbarContainer: 'body',
 		tools: [ // an array of tools to list in the toolbar
 			[
 				{
@@ -298,7 +299,7 @@ function pan(core, direction, factors) {
 								return e.cyTarget.isNode();
 							case 'edge':
 							    return e.cyTarget.isEdge();
-						    case 'node,edget':
+						    case 'node,edge':
 						    case 'edge,node':
 						        return e.cyTarget.isNode() || e.cyTarget.isEdge();
 							case 'cy':
@@ -378,7 +379,7 @@ function pan(core, direction, factors) {
 										.css(cssOptions)
 					data.$container = $toolbar;
 
-					$toolbar.appendTo('body');
+					$toolbar.appendTo(options.toolbarContainer);
 
 					$.each(options.tools, function (toolListIndex, toolList) {
 						var $toolListWrapper = $('<div class="' + options.multipleToolsClass + '-wrapper"></div>')
